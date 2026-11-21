@@ -1166,7 +1166,7 @@ buildBoard($('#previewBoard'),false);
 (()=>{const w=document.querySelectorAll('#previewBoard .wedge');[0,2,3,5].forEach(k=>w[k].setAttribute('fill-opacity','1'))})();
 renderHome();
 netBoot();
-if('serviceWorker' in navigator){addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})})}
+if('serviceWorker' in navigator){let reloaded=false;const had=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!reloaded&&!(G&&$('#game').classList.contains('on'))){reloaded=true;location.reload()}});addEventListener('load',()=>{navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).catch(()=>{})})}
 </script>
 </body>
 </html>
