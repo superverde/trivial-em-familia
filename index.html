@@ -87,7 +87,7 @@ label.lbl{display:block;font-weight:800;margin-bottom:6px}
 .side{display:grid;gap:14px}
 .turnbox{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:16px;display:grid;gap:12px}
 .who{display:flex;align-items:center;gap:12px}
-.dot{width:46px;height:46px;border-radius:50%;background:var(--pc);display:grid;place-items:center;font-family:var(--fd);font-weight:800;color:#0b2530;font-size:1.3rem;border:3px solid #fff;flex:none}
+.dot{width:46px;height:46px;border-radius:50%;background:var(--pc);display:grid;place-items:center;font-family:var(--fd);font-weight:800;color:#0b2530;font-size:1.15rem;border:3px solid #fff;flex:none}
 .pname{font-family:var(--fd);font-size:1.6rem;font-weight:800;line-height:1}
 .rollrow{display:flex;align-items:center;gap:16px}
 #act{display:grid;gap:8px;flex:1}
@@ -100,7 +100,7 @@ label.lbl{display:block;font-weight:800;margin-bottom:6px}
 .players{display:grid;gap:8px}
 .pcard{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:10px 12px}
 .pcard.cur{border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,207,74,.18)}
-.pcard .dot{width:36px;height:36px;font-size:1rem;border-width:2px}
+.pcard .dot{width:38px;height:38px;font-size:.9rem;border-width:2px}
 .pcard .nm{font-weight:800;line-height:1.15}
 .pcard .sub{font-size:.8rem;color:var(--muted)}
 .pcard .pts{font-family:var(--fd);font-weight:800;font-size:1.25rem;font-variant-numeric:tabular-nums;text-align:right}
@@ -120,6 +120,11 @@ label.lbl{display:block;font-weight:800;margin-bottom:6px}
 @keyframes pulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.45)}}
 .pawn{transition:transform .17s ease-out}
 .sqtxt{font-family:var(--fd);font-weight:800;fill:#0b2530;pointer-events:none}
+.pawn .halo,.pawn .ptag{display:none}
+.pawn.me .halo{display:inline;animation:halo 1.2s ease-in-out infinite;transform-origin:0 0}
+.pawn.me .ptag{display:inline}
+.pawn{pointer-events:none}
+@keyframes halo{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(1.18)}}
 
 /* die */
 .die-scene{width:76px;height:76px;perspective:420px;flex:none}
@@ -486,7 +491,10 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const rnd=a=>a[Math.floor(Math.random()*a.length)];
-const initial=p=>(p.name.trim()[0]||'?').toUpperCase();
+function makeLabels(list){const names=list.map(p=>(p.name||'').trim()||'?');
+  const cands=names.map((n,i)=>{const w=n.split(/\s+/),f=n[0].toUpperCase();return[f,w[1]?f+w[1][0].toUpperCase():null,n.length>1?f+n[1].toLowerCase():null,f+(i+1)]});
+  return names.map((n,i)=>{for(let lv=0;lv<4;lv++){const c=cands[i][lv];if(!c)continue;if(cands.filter((x,j)=>j!==i&&x[lv]===c).length===0)return c}return cands[i][3]})}
+const initial=p=>{const L=G&&G.players.includes(p)?makeLabels(G.players):SET&&SET.players.includes(p)?makeLabels(SET.players):null;if(L){const i=(G&&G.players.includes(p)?G.players:SET.players).indexOf(p);return L[i]}return((p.name||'').trim()[0]||'?').toUpperCase()};
 function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));window.scrollTo(0,0);if(id==='home')renderHome();if(id==='family')renderFamily();}
 document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>show(b.dataset.go));
 
@@ -587,11 +595,15 @@ function buildBoard(svg,interactive){
 }
 function renderPawns(){
   const g=$('#pawns');if(!g||!G)return;
-  if(g.childElementCount!==G.players.length){g.innerHTML=G.players.map((p,i)=>`<g class="pawn" id="pawn${i}"><circle r="21" fill="${p.color}" stroke="#0b2530" stroke-width="5"/><circle r="21" fill="none" stroke="#fff" stroke-width="2" opacity=".85"/><text y="8" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="800" font-size="23" fill="#0b2530">${esc(initial(p))}</text></g>`).join('')}
+  if(g.childElementCount!==G.players.length){g.innerHTML=G.players.map((p,i)=>{const l=initial(p),nm=p.name.length>10?p.name.slice(0,9)+'…':p.name,tw=Math.max(70,nm.length*13+24);
+    return`<g class="pawn" id="pawn${i}"><circle class="halo" r="40" fill="none" stroke="#ffcf4a" stroke-width="7"/><ellipse cx="3" cy="7" rx="29" ry="27" fill="#000" opacity=".35"/><circle r="29" fill="${p.color}" stroke="#0b2530" stroke-width="6"/><circle r="29" fill="none" stroke="#fff" stroke-width="3"/><text y="${l.length>1?9:11}" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="800" font-size="${l.length>1?26:32}" fill="#0b2530">${esc(l)}</text>
+    <g class="ptag"><rect x="${-tw/2}" y="38" width="${tw}" height="34" rx="17" fill="${p.color}" stroke="#0b2530" stroke-width="4"/><text y="62" text-anchor="middle" font-family="Nunito, sans-serif" font-weight="800" font-size="21" fill="#0b2530">${esc(nm)}</text></g></g>`}).join('')}
+  G.players.forEach((p,i)=>{const el=$('#pawn'+i);if(el)el.classList.toggle('me',i===G.turn)});
   const groups={};G.players.forEach((p,i)=>{(groups[p.pos]=groups[p.pos]||[]).push(i)});
   Object.entries(groups).forEach(([pos,ids])=>{pos=+pos;let bx,by;if(pos===-1){bx=500;by=500}else{[bx,by]=pt(420,ang(pos))}
-    ids.forEach((pi,j)=>{let x=bx,y=by;if(ids.length>1){const r=ids.length>4?30:24,a=2*Math.PI*j/ids.length;x+=r*Math.cos(a);y+=r*Math.sin(a)}
-      const el=$('#pawn'+pi);el.style.transform=`translate(${x}px,${y}px)`;});});
+    const n=ids.length,sc=n>3?.72:n>1?.85:1,r=n>1?Math.max(28,31*sc/Math.sin(Math.PI/n)):0;
+    ids.forEach((pi,j)=>{const a=ang(pos<0?0:pos)+Math.PI/2+2*Math.PI*j/n,x=bx+r*Math.cos(a),y=by+r*Math.sin(a);
+      const el=$('#pawn'+pi),k=pi===G.turn?Math.max(sc,.9):sc;el.style.transform=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px) scale(${k})`;});});
   // jogador atual por cima
   const cur=$('#pawn'+G.turn);if(cur&&cur.parentNode.lastChild!==cur)cur.parentNode.appendChild(cur);
 }
@@ -825,8 +837,8 @@ let SET={players:[{name:'Jogador 1',color:PCOLORS[0],level:'adu'},{name:'Jogador
 const lastSet=LS.get('tef_setup',null);if(lastSet)SET=lastSet;
 function seg(el,opts,val,onPick){el.innerHTML=opts.map(o=>`<button type="button" aria-pressed="${o.v===val}" data-v="${o.v}">${o.l}</button>`).join('');el.querySelectorAll('button').forEach(b=>b.onclick=()=>{onPick(JSON.parse(b.dataset.v));renderSetup()})}
 function renderSetup(){
-  $('#playerRows').innerHTML=SET.players.map((p,i)=>`<div class="prow"><button class="pcolor" data-i="${i}" style="background:${p.color}" aria-label="Mudar cor de ${esc(p.name)}">${esc((p.name.trim()[0]||'?').toUpperCase())}</button><input type="text" id="pn${i}" value="${esc(p.name)}" maxlength="16" aria-label="Nome do jogador ${i+1}"><select id="pl${i}" aria-label="Nível">${Object.entries(LEVELS).map(([k,l])=>`<option value="${k}" ${p.level===k?'selected':''}>${l.n}</option>`).join('')}</select><button class="iconbtn" data-del="${i}" aria-label="Remover" ${SET.players.length<=2?'disabled':''}>×</button></div>`).join('');
-  SET.players.forEach((p,i)=>{$('#pn'+i).oninput=e=>{p.name=e.target.value;document.querySelector(`.pcolor[data-i="${i}"]`).textContent=(p.name.trim()[0]||'?').toUpperCase()};$('#pl'+i).onchange=e=>p.level=e.target.value});
+  $('#playerRows').innerHTML=SET.players.map((p,i)=>`<div class="prow"><button class="pcolor" data-i="${i}" style="background:${p.color}" aria-label="Mudar cor de ${esc(p.name)}">${esc(makeLabels(SET.players)[i])}</button><input type="text" id="pn${i}" value="${esc(p.name)}" maxlength="16" aria-label="Nome do jogador ${i+1}"><select id="pl${i}" aria-label="Nível">${Object.entries(LEVELS).map(([k,l])=>`<option value="${k}" ${p.level===k?'selected':''}>${l.n}</option>`).join('')}</select><button class="iconbtn" data-del="${i}" aria-label="Remover" ${SET.players.length<=2?'disabled':''}>×</button></div>`).join('');
+  SET.players.forEach((p,i)=>{$('#pn'+i).oninput=e=>{p.name=e.target.value;const L=makeLabels(SET.players);document.querySelectorAll('.pcolor').forEach((b,j)=>b.textContent=L[j])};$('#pl'+i).onchange=e=>p.level=e.target.value});
   document.querySelectorAll('.pcolor').forEach(b=>b.onclick=()=>{const p=SET.players[+b.dataset.i];const taken=SET.players.map(x=>x.color);let j=PCOLORS.indexOf(p.color);for(let t=0;t<8;t++){j=(j+1)%8;if(!taken.includes(PCOLORS[j]))break}p.color=PCOLORS[j];renderSetup()});
   document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{SET.players.splice(+b.dataset.del,1);renderSetup()});
   $('#addPlayer').disabled=SET.players.length>=8;
