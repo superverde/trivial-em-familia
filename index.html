@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trivial em Família</title>
+<meta name="theme-color" content="#0b2530">
+<meta name="description" content="Jogo de cultura geral para jogar em família. Quem sabe mais?">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Trivial">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Mesa de jogo: feltro azul-petróleo, tabuleiro circular ao centro, painel lateral de turno */
+  --felt:#0b2530; --felt2:#12404f; --panel:#0f2f3b; --line:#235466;
+  --ink:#f6f3ea; --muted:#a3bac2; --gold:#ffcf4a;
+  --ok:#34d399; --bad:#f87171;
+  --fd:'Baloo 2', 'Trebuchet MS', system-ui, sans-serif;
+  --fb:'Nunito', 'Segoe UI', system-ui, sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:radial-gradient(1100px 760px at 50% 28%, var(--felt2) 0%, var(--felt) 62%) fixed, var(--felt);color:var(--ink);font-family:var(--fb);font-size:16px;line-height:1.45;-webkit-tap-highlight-color:transparent}
+h1,h2,h3{font-family:var(--fd);line-height:1.1;margin:0;text-wrap:balance}
+button{font:inherit;color:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.screen{display:none;min-height:100%;flex-direction:column}
+.screen.on{display:flex}
+.wrap{width:100%;max-width:1160px;margin:0 auto;padding:16px}
+.btn{border:0;border-radius:14px;padding:12px 18px;font-weight:800;font-size:1rem;cursor:pointer;background:#1b4554;color:var(--ink);box-shadow:0 3px 0 #08202a;transition:transform .08s, filter .15s}
+.btn:hover{filter:brightness(1.12)}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 #08202a}
+.btn.primary{background:var(--gold);color:#2a2100;box-shadow:0 4px 0 #b88a10}
+.btn.ghost{background:transparent;box-shadow:none;border:2px solid var(--line)}
+.btn.small{padding:8px 12px;font-size:.9rem;border-radius:10px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.eyebrow{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:800}
+
+/* HOME */
+#home .wrap{display:grid;gap:28px;align-items:center;min-height:100%;grid-template-columns:1fr}
+@media(min-width:860px){#home .wrap{grid-template-columns:1.1fr 1fr;padding-top:48px}}
+.logo{font-family:var(--fd);font-weight:800;font-size:clamp(2.6rem,7vw,4.4rem);line-height:.95;letter-spacing:-.01em}
+.logo em{font-style:normal;color:var(--gold);display:block}
+.tagline{font-family:var(--fd);font-size:1.4rem;font-weight:700;color:var(--muted);margin:10px 0 22px}
+.homebtns{display:flex;flex-wrap:wrap;gap:10px}
+.homebtns .btn{font-size:1.05rem}
+.catlist{display:flex;flex-wrap:wrap;gap:6px;margin:22px 0 8px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:#0d2a35;border:1px solid var(--line);font-size:.85rem;font-weight:700}
+.chip i{width:10px;height:10px;border-radius:50%;background:var(--cc)}
+.stats{color:var(--muted);font-size:.9rem;font-variant-numeric:tabular-nums}
+.linkbtn{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;padding:0;font-size:.9rem}
+.preview svg{width:100%;max-width:520px;display:block;margin:0 auto;filter:drop-shadow(0 18px 30px rgba(0,0,0,.45))}
+
+/* SETUP & FAMILY */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:18px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;max-width:1160px;width:100%;margin:0 auto}
+.topbar h1{font-size:1.5rem}
+.prow{display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.prow:last-child{border-bottom:0}
+.pcolor{width:42px;height:42px;border-radius:50%;border:3px solid #fff;cursor:pointer;font-family:var(--fd);font-weight:800;color:#0b2530;font-size:1.1rem}
+input[type=text],select,textarea{width:100%;background:#0a2530;border:2px solid var(--line);border-radius:12px;color:var(--ink);padding:10px 12px;font:inherit}
+textarea{min-height:70px;resize:vertical}
+.iconbtn{background:none;border:2px solid var(--line);border-radius:10px;width:40px;height:40px;cursor:pointer;font-size:1.2rem;color:var(--muted)}
+.opts-grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin-top:14px}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{border:2px solid var(--line);background:#0a2530;border-radius:10px;padding:8px 12px;cursor:pointer;font-weight:700}
+.seg button[aria-pressed=true]{background:var(--gold);border-color:var(--gold);color:#2a2100}
+label.lbl{display:block;font-weight:800;margin-bottom:6px}
+.stack{display:grid;gap:14px}
+.famitem{display:flex;gap:10px;justify-content:space-between;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)}
+.famitem small{color:var(--muted)}
+@media(max-width:520px){.prow{grid-template-columns:auto 1fr auto}.prow select{grid-column:2 / 4}}
+
+/* GAME */
+.gamewrap{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;padding:0 12px 18px;max-width:1240px;width:100%;margin:0 auto}
+@media(min-width:960px){.gamewrap{grid-template-columns:minmax(0,1fr) 370px;align-items:start}}
+.boardbox{position:relative}
+.boardbox svg{width:100%;height:auto;max-height:84vh;display:block;margin:0 auto;filter:drop-shadow(0 16px 26px rgba(0,0,0,.45))}
+.side{display:grid;gap:14px}
+.turnbox{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:16px;display:grid;gap:12px}
+.who{display:flex;align-items:center;gap:12px}
+.dot{width:46px;height:46px;border-radius:50%;background:var(--pc);display:grid;place-items:center;font-family:var(--fd);font-weight:800;color:#0b2530;font-size:1.3rem;border:3px solid #fff;flex:none}
+.pname{font-family:var(--fd);font-size:1.6rem;font-weight:800;line-height:1}
+.rollrow{display:flex;align-items:center;gap:16px}
+#act{display:grid;gap:8px;flex:1}
+#msg{color:var(--muted);font-size:.95rem}
+#msg strong{color:var(--ink)}
+.destbtns{display:grid;gap:8px}
+.destbtn{display:flex;align-items:center;gap:10px;text-align:left;background:#0a2530;border:2px solid var(--cc,var(--line));border-radius:12px;padding:10px 12px;cursor:pointer;font-weight:700}
+.destbtn i{width:14px;height:14px;border-radius:4px;background:var(--cc);flex:none}
+.rollnum{font-family:var(--fd);font-weight:800;font-size:1.3rem}
+.players{display:grid;gap:8px}
+.pcard{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:10px 12px}
+.pcard.cur{border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,207,74,.18)}
+.pcard .dot{width:36px;height:36px;font-size:1rem;border-width:2px}
+.pcard .nm{font-weight:800;line-height:1.15}
+.pcard .sub{font-size:.8rem;color:var(--muted)}
+.pcard .pts{font-family:var(--fd);font-weight:800;font-size:1.25rem;font-variant-numeric:tabular-nums;text-align:right}
+.pcard .pts small{display:block;font-family:var(--fb);font-size:.7rem;color:var(--muted);font-weight:700}
+.held{display:flex;gap:4px;flex-wrap:wrap;margin-top:3px}
+.held span{font-size:.68rem;font-weight:800;padding:1px 6px;border-radius:6px;background:#173f4d;color:var(--gold)}
+.gametop{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;max-width:1240px;width:100%;margin:0 auto;gap:10px}
+.gametop .brand{font-family:var(--fd);font-weight:800;font-size:1.25rem}
+.gametop .brand span{color:var(--gold)}
+@media(max-width:520px){.gametop .brand{font-size:1.05rem}.gametop .btn.small{padding:6px 9px;font-size:.8rem}}
+
+/* board svg */
+.sq{transition:filter .2s}
+.sq.dest{stroke:#fff;stroke-width:7;cursor:pointer;animation:pulse 1s ease-in-out infinite}
+.sq.cur{stroke:var(--gold);stroke-width:6}
+#hub.dest{cursor:pointer;animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.45)}}
+.pawn{transition:transform .17s ease-out}
+.sqtxt{font-family:var(--fd);font-weight:800;fill:#0b2530;pointer-events:none}
+
+/* die */
+.die-scene{width:76px;height:76px;perspective:420px;flex:none}
+.die{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform 1s cubic-bezier(.17,.84,.3,1)}
+.face{position:absolute;inset:0;background:#fffdf7;border-radius:16px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:11px;box-shadow:inset 0 0 0 2px #e7e0cd, inset 0 -7px 12px rgba(0,0,0,.10)}
+.face span{width:13px;height:13px;border-radius:50%;background:#183039;place-self:center}
+.f1{transform:translateZ(38px)}.f6{transform:rotateY(180deg) translateZ(38px)}
+.f3{transform:rotateY(90deg) translateZ(38px)}.f4{transform:rotateY(-90deg) translateZ(38px)}
+.f2{transform:rotateX(90deg) translateZ(38px)}.f5{transform:rotateX(-90deg) translateZ(38px)}
+
+/* sheet (perguntas, cartas, mensagens) */
+.sheet{position:fixed;inset:0;background:rgba(4,16,21,.72);display:flex;align-items:flex-end;justify-content:center;z-index:20;padding:0}
+.sheet[hidden]{display:none}
+@media(min-width:640px){.sheet{align-items:center;padding:20px}}
+.scard{width:100%;max-width:600px;max-height:96%;overflow:auto;background:#fbf8f0;color:#152a32;border-radius:24px 24px 0 0;padding:0 0 18px;box-shadow:0 -10px 40px rgba(0,0,0,.4);animation:up .25s ease-out}
+@media(min-width:640px){.scard{border-radius:24px}}
+@keyframes up{from{transform:translateY(30px);opacity:.4}to{transform:none;opacity:1}}
+.qhead{background:var(--cc);padding:14px 20px 12px;display:flex;justify-content:space-between;align-items:flex-end;gap:10px;color:#10232a}
+.qcat{font-family:var(--fd);font-weight:800;font-size:1.35rem}
+.qmeta{font-weight:800;font-size:.85rem;opacity:.85;text-align:right}
+.tbar{height:8px;background:#e5dfd0;position:relative}
+.tbar i{position:absolute;left:0;top:0;bottom:0;background:#1d6f86;width:100%}
+.tbar i.low{background:#e0453a}
+.tnum{float:right;font-weight:800;font-variant-numeric:tabular-nums;color:#5d6d72;font-size:.85rem;padding:6px 20px 0}
+.qtext{font-family:var(--fb);font-weight:800;font-size:1.35rem;padding:16px 20px 6px;color:#10232a}
+.sbody{padding:4px 20px}
+.opts{display:grid;gap:10px;padding:10px 20px}
+.opt{display:flex;align-items:center;gap:12px;text-align:left;background:#fff;border:2px solid #ddd5c2;border-radius:14px;padding:12px 14px;cursor:pointer;font-weight:700;font-size:1.05rem;color:#152a32;transition:background .15s,border-color .15s}
+.opt b{width:32px;height:32px;flex:none;border-radius:9px;background:#ece5d3;display:grid;place-items:center;font-family:var(--fd)}
+.opt:hover:not(:disabled){border-color:#1d6f86}
+.opt:disabled{cursor:default}
+.opt.right{background:#d8f7e7;border-color:#1f9d62}
+.opt.right b{background:#1f9d62;color:#fff}
+.opt.wrong{background:#fde2df;border-color:#d4483d}
+.opt.wrong b{background:#d4483d;color:#fff}
+.opt.picked{background:#e3eef2;border-color:#1d6f86}
+.opt.off{opacity:.45}
+#qfoot{padding:4px 20px 0}
+.verdict{font-family:var(--fd);font-weight:800;font-size:1.4rem;margin:6px 0 2px}
+.verdict.ok{color:#1a8a56}.verdict.no{color:#c43c32}
+.expl{color:#3e5259;margin:4px 0 14px}
+.sbtns{display:flex;flex-wrap:wrap;gap:8px;padding:12px 20px 0}
+.sbtns .btn{flex:1 1 auto}
+.scard .btn{background:#e9e2cf;color:#152a32;box-shadow:0 3px 0 #c9bfa5}
+.scard .btn.primary{background:#1d6f86;color:#fff;box-shadow:0 4px 0 #11495a}
+.scard .btn.catb{background:var(--cc);color:#10232a;box-shadow:0 3px 0 rgba(0,0,0,.25)}
+.mtitle{font-family:var(--fd);font-weight:800;font-size:1.7rem;padding:18px 20px 4px;color:#10232a}
+.mband{height:10px;background:var(--cc)}
+.playcard{margin:14px 20px 4px;border-radius:18px;padding:18px;background:var(--cc);color:#10232a;display:grid;gap:4px;animation:flip .5s ease-out}
+.playcard .k{font-size:.75rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.75}
+.playcard h3{font-size:1.6rem}
+@keyframes flip{from{transform:rotateY(80deg)}to{transform:none}}
+.rank{width:calc(100% - 40px);margin:10px 20px;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.rank td,.rank th{padding:7px 4px;border-bottom:1px solid #e3dccb;text-align:left}
+.rank th{font-size:.75rem;text-transform:uppercase;color:#5d6d72}
+.rank td:last-child,.rank th:last-child{text-align:right}
+.rules{padding:4px 20px;color:#2c4148}
+.rules h3{font-size:1.15rem;margin:14px 0 4px;color:#10232a}
+.rules ul{margin:4px 0;padding-left:20px}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#fbf8f0;color:#152a32;font-weight:800;padding:12px 18px;border-radius:14px;z-index:30;box-shadow:0 8px 24px rgba(0,0,0,.35);max-width:calc(100% - 32px);text-align:center}
+.toast[hidden]{display:none}
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:40}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<!-- INÍCIO -->
+<main id="home" class="screen on">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">Jogo de cultura geral · 2 a 8 jogadores · um telemóvel</div>
+      <h1 class="logo" style="margin-top:10px">Trivial<em>em Família</em></h1>
+      <p class="tagline">Quem sabe mais?</p>
+      <div class="homebtns">
+        <button class="btn primary" id="btnNew">Nova partida</button>
+        <button class="btn" id="btnResume" hidden>Continuar partida</button>
+        <button class="btn" id="btnFamily">A Nossa Família</button>
+        <button class="btn ghost" id="btnRules">Como jogar</button>
+      </div>
+      <div class="catlist" id="catChips"></div>
+      <p class="stats" id="homeStats"></p>
+      <button class="linkbtn" id="btnClearHist">Limpar histórico de perguntas</button>
+    </div>
+    <div class="preview"><svg id="previewBoard" viewBox="0 0 1000 1000" aria-label="Tabuleiro do jogo"></svg></div>
+  </div>
+</main>
+
+<!-- CONFIGURAÇÃO -->
+<main id="setup" class="screen">
+  <div class="topbar"><h1>Nova partida</h1><button class="btn ghost small" data-go="home">Voltar</button></div>
+  <div class="wrap stack" style="padding-top:0;max-width:760px">
+    <section class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+        <h2 style="font-size:1.3rem">Jogadores</h2>
+        <button class="btn small" id="addPlayer">Adicionar jogador</button>
+      </div>
+      <p class="stats" style="margin:6px 0 4px">Toque no círculo para mudar a cor do peão. O nível ajusta a dificuldade das perguntas.</p>
+      <div id="playerRows"></div>
+    </section>
+    <section class="panel">
+      <h2 style="font-size:1.3rem">Regras da partida</h2>
+      <div class="opts-grid">
+        <div><label class="lbl">Peças para vencer</label><div class="seg" id="optNeed"></div></div>
+        <div><label class="lbl">Tempo por pergunta</label><div class="seg" id="optTimer"></div></div>
+        <div><label class="lbl">Som</label><div class="seg" id="optSound"></div></div>
+      </div>
+    </section>
+    <p class="stats" id="setupErr" style="color:var(--bad)"></p>
+    <button class="btn primary" id="startGame" style="font-size:1.15rem;padding:16px">Começar a partida</button>
+  </div>
+</main>
+
+<!-- JOGO -->
+<main id="game" class="screen">
+  <div class="gametop">
+    <div class="brand">Trivial <span>em Família</span></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn ghost small" id="btnSound" aria-pressed="true">Som: sim</button>
+      <button class="btn ghost small" id="btnRules2">Regras</button>
+      <button class="btn ghost small" id="btnExit">Menu</button>
+    </div>
+  </div>
+  <div class="gamewrap">
+    <div class="boardbox"><svg id="board" viewBox="0 0 1000 1000" role="img" aria-label="Tabuleiro"></svg></div>
+    <aside class="side">
+      <div class="turnbox">
+        <div class="who" id="who"></div>
+        <div class="rollrow">
+          <div class="die-scene" aria-hidden="true"><div class="die" id="die"></div></div>
+          <div id="act"></div>
+        </div>
+        <div id="msg"></div>
+      </div>
+      <div class="players" id="players"></div>
+    </aside>
+  </div>
+</main>
+
+<!-- A NOSSA FAMÍLIA -->
+<main id="family" class="screen">
+  <div class="topbar"><h1>A Nossa Família</h1><button class="btn ghost small" data-go="home">Voltar</button></div>
+  <div class="wrap stack" style="padding-top:0;max-width:760px">
+    <section class="panel">
+      <p class="stats" style="margin-top:0">Perguntas sobre histórias, viagens e memórias da família. Aparecem no jogo através da carta surpresa «A Nossa Família». Ficam guardadas neste dispositivo.</p>
+      <form id="famForm" class="stack" autocomplete="off">
+        <div><label class="lbl" for="fq">Pergunta</label><textarea id="fq" required placeholder="Ex.: Em que praia passámos as férias de 2019?"></textarea></div>
+        <div><label class="lbl" for="fa0">Resposta certa</label><input type="text" id="fa0" required></div>
+        <div class="opts-grid" style="margin-top:0">
+          <div><label class="lbl" for="fa1">Errada 1</label><input type="text" id="fa1" required></div>
+          <div><label class="lbl" for="fa2">Errada 2</label><input type="text" id="fa2" required></div>
+          <div><label class="lbl" for="fa3">Errada 3</label><input type="text" id="fa3" required></div>
+        </div>
+        <div><label class="lbl" for="fe">Explicação ou história (opcional)</label><input type="text" id="fe"></div>
+        <button class="btn primary" type="submit">Guardar pergunta</button>
+      </form>
+    </section>
+    <section class="panel">
+      <h2 style="font-size:1.3rem">Perguntas guardadas <span class="stats" id="famCount"></span></h2>
+      <div id="famList"></div>
+    </section>
+  </div>
+</main>
+
+<div id="sheet" class="sheet" hidden><div class="scard" id="scard" role="dialog" aria-modal="true"></div></div>
+<div id="toast" class="toast" hidden></div>
+<canvas id="confetti"></canvas>
+
+<script>
+/* ================= DADOS ================= */
+const CATS=[
+  {k:'his',n:'História',s:'H',c:'#f5b700'},
+  {k:'geo',n:'Geografia',s:'G',c:'#3b8eea'},
+  {k:'cie',n:'Ciência e Natureza',s:'C',c:'#2fb36d'},
+  {k:'ent',n:'Entretenimento',s:'E',c:'#ec4899'},
+  {k:'des',n:'Desporto',s:'D',c:'#fb7a24'},
+  {k:'cul',n:'Cultura Geral',s:'CG',c:'#9b5de5'},
+  {k:'atu',n:'Atualidades',s:'A',c:'#ef4444'}
+];
+const FAMCAT={n:'A Nossa Família',c:'#ffcf4a'};
+// [dificuldade 1-3, pergunta, certa, errada, errada, errada, explicação]
+const RAW={
+his:[
+[1,"Em que ano aconteceu a Revolução dos Cravos?","1974","1968","1980","1910","A 25 de Abril de 1974, o Movimento das Forças Armadas pôs fim ao Estado Novo."],
+[1,"Quem foi o primeiro rei de Portugal?","D. Afonso Henriques","D. Dinis","D. Sancho I","D. João I","D. Afonso Henriques foi reconhecido rei de Portugal; o Tratado de Zamora (1143) é a data de referência."],
+[1,"Que navegador chegou à Índia por mar em 1498?","Vasco da Gama","Pedro Álvares Cabral","Bartolomeu Dias","Fernão de Magalhães","Vasco da Gama chegou a Calecute em maio de 1498, abrindo a rota marítima para a Índia."],
+[2,"Em que ano foi implantada a República em Portugal?","1910","1891","1926","1908","A República foi proclamada a 5 de Outubro de 1910, em Lisboa."],
+[2,"Que batalha de 1385 garantiu a independência de Portugal face a Castela?","Aljubarrota","Ourique","São Mamede","Alcácer Quibir","Em Aljubarrota, D. João I e Nuno Álvares Pereira derrotaram o exército castelhano."],
+[2,"Que rei desapareceu na batalha de Alcácer Quibir, em 1578?","D. Sebastião","D. Manuel I","D. João III","D. Henrique","O desaparecimento de D. Sebastião deu origem ao mito do sebastianismo."],
+[1,"Em que ano caiu o Muro de Berlim?","1989","1991","1985","1961","O Muro caiu a 9 de novembro de 1989; tinha sido construído em 1961."],
+[2,"Quem foi o primeiro-ministro britânico durante a maior parte da Segunda Guerra Mundial?","Winston Churchill","Neville Chamberlain","Clement Attlee","Margaret Thatcher","Churchill liderou o governo britânico de 1940 a 1945."],
+[1,"Que povo construiu as pirâmides de Gizé?","Os antigos egípcios","Os romanos","Os maias","Os gregos","As pirâmides de Gizé foram construídas há cerca de 4500 anos, no Antigo Egito."],
+[2,"Em que ano o grande terramoto destruiu grande parte de Lisboa?","1755","1640","1807","1580","O terramoto de 1 de novembro de 1755 foi seguido de um tsunami e de incêndios."],
+[2,"Quem liderou a reconstrução de Lisboa depois do terramoto de 1755?","Marquês de Pombal","Duque de Saldanha","Fontes Pereira de Melo","Afonso Costa","Sebastião José de Carvalho e Melo, o Marquês de Pombal, mandou reconstruir a Baixa."],
+[3,"Em que ano Portugal aderiu à Comunidade Económica Europeia (CEE)?","1986","1974","1992","1999","Portugal e Espanha entraram na CEE a 1 de janeiro de 1986."],
+[1,"Quem foi o primeiro ser humano a pisar a Lua?","Neil Armstrong","Buzz Aldrin","Yuri Gagarin","Michael Collins","Armstrong pisou a Lua a 20 de julho de 1969, na missão Apollo 11."],
+[2,"Em que ano Portugal restaurou a independência, pondo fim à união com Espanha?","1640","1580","1668","1385","A 1 de Dezembro de 1640 foi aclamado D. João IV."],
+[3,"Que tratado de 1494 dividiu o mundo entre Portugal e Castela?","Tratado de Tordesilhas","Tratado de Windsor","Tratado de Zamora","Tratado de Utrecht","Tordesilhas fixou uma linha a 370 léguas a oeste de Cabo Verde."],
+[2,"Que imperador francês foi derrotado em Waterloo, em 1815?","Napoleão Bonaparte","Luís XIV","Carlos Magno","Napoleão III","Depois de Waterloo, Napoleão foi exilado na ilha de Santa Helena."],
+[3,"Quem governou o Estado Novo até 1968?","António de Oliveira Salazar","Marcelo Caetano","Óscar Carmona","Humberto Delgado","Salazar foi substituído por Marcelo Caetano em 1968."],
+[1,"Em que ano começou a Segunda Guerra Mundial?","1939","1914","1945","1936","A guerra começou com a invasão da Polónia pela Alemanha, em setembro de 1939."],
+[3,"Que navegador português dobrou o Cabo da Boa Esperança em 1488?","Bartolomeu Dias","Diogo Cão","Gil Eanes","Vasco da Gama","Bartolomeu Dias chamou-lhe inicialmente Cabo das Tormentas."],
+[2,"Em que ano o Brasil declarou a independência?","1822","1808","1889","1500","D. Pedro proclamou a independência a 7 de setembro de 1822."],
+[3,"Que rainha de Portugal está ligada ao «milagre das rosas»?","Rainha Santa Isabel","D. Leonor","D. Maria I","D. Filipa de Lencastre","Isabel de Aragão, mulher de D. Dinis, é padroeira de Coimbra."],
+[2,"Quem chegou ao Brasil em 1500, à frente de uma armada portuguesa?","Pedro Álvares Cabral","Vasco da Gama","Cristóvão Colombo","Fernão de Magalhães","A armada de Cabral chegou a Porto Seguro em abril de 1500."]
+],
+geo:[
+[1,"Qual é a capital de Espanha?","Madrid","Barcelona","Sevilha","Valência","Madrid é a capital desde o século XVI."],
+[2,"Qual é o rio mais longo da Península Ibérica?","Tejo","Douro","Guadiana","Ebro","O Tejo tem cerca de 1000 km e desagua em Lisboa."],
+[2,"Qual é o ponto mais alto de Portugal?","Montanha do Pico, nos Açores","Torre, na Serra da Estrela","Pico Ruivo, na Madeira","Serra do Gerês","A Montanha do Pico tem 2351 metros de altitude."],
+[2,"Qual é o ponto mais alto de Portugal continental?","Torre, na Serra da Estrela","Serra do Marão","Serra do Caramulo","Pico da Nevosa","A Torre tem cerca de 1993 metros."],
+[1,"Qual é o maior oceano do mundo?","Pacífico","Atlântico","Índico","Ártico","O Pacífico cobre cerca de um terço da superfície da Terra."],
+[2,"Qual é a capital da Austrália?","Camberra","Sydney","Melbourne","Perth","Camberra foi criada de raiz como capital, entre Sydney e Melbourne."],
+[2,"Quantas ilhas tem o arquipélago dos Açores?","9","7","10","12","As nove ilhas dividem-se em três grupos: oriental, central e ocidental."],
+[1,"Em que continente fica o Egito?","África","Ásia","Europa","Oceânia","O Egito fica no nordeste de África; a península do Sinai já é território asiático."],
+[1,"Qual é o maior país do mundo em área?","Rússia","Canadá","China","Estados Unidos","A Rússia tem mais de 17 milhões de km²."],
+[2,"Qual é a capital do Canadá?","Otava","Toronto","Vancouver","Montreal","Otava (Ottawa) fica na província do Ontário."],
+[3,"Qual é o distrito português com maior área?","Beja","Évora","Santarém","Bragança","O distrito de Beja tem mais de 10 000 km²."],
+[1,"Em que cidade fica a Torre de Belém?","Lisboa","Porto","Coimbra","Setúbal","A Torre de Belém, do século XVI, é Património Mundial da UNESCO."],
+[1,"Em que cidade fica a estátua do Cristo Redentor?","Rio de Janeiro","São Paulo","Lisboa","Salvador","A estátua está no alto do Corcovado desde 1931."],
+[3,"Que rio atravessa a cidade de Coimbra?","Mondego","Douro","Vouga","Zêzere","O Mondego é o maior rio que nasce e desagua em território português."],
+[1,"Qual é o maior deserto quente do mundo?","Saara","Gobi","Kalahari","Atacama","O Saara ocupa grande parte do norte de África."],
+[3,"Qual é a capital da Nova Zelândia?","Wellington","Auckland","Christchurch","Queenstown","Auckland é a maior cidade, mas a capital é Wellington."],
+[2,"Que país tem mais habitantes no mundo?","Índia","China","Estados Unidos","Indonésia","A Índia ultrapassou a China em 2023, segundo a ONU."],
+[2,"Que estreito separa a Europa de África?","Estreito de Gibraltar","Estreito do Bósforo","Estreito de Ormuz","Estreito de Magalhães","Na parte mais estreita, tem cerca de 14 km."],
+[3,"Qual é a capital de Cabo Verde?","Praia","Mindelo","Santa Maria","Assomada","A Praia fica na ilha de Santiago."],
+[1,"Em que país fica a Torre Eiffel?","França","Bélgica","Itália","Suíça","A Torre Eiffel foi construída em Paris para a Exposição Universal de 1889."],
+[3,"Qual é a montanha mais alta de África?","Kilimanjaro","Monte Quénia","Toubkal","Ruwenzori","O Kilimanjaro, na Tanzânia, tem 5895 metros."],
+[1,"Que país tem a forma de uma bota?","Itália","Grécia","Croácia","Chile","A península itálica lembra uma bota a «chutar» a Sicília."]
+],
+cie:[
+[1,"Qual é o planeta mais próximo do Sol?","Mercúrio","Vénus","Marte","Terra","Mercúrio é também o planeta mais pequeno do Sistema Solar."],
+[2,"Quantos ossos tem o corpo humano adulto?","206","186","226","312","Os bebés nascem com mais ossos, que se vão fundindo com o crescimento."],
+[1,"Que gás as plantas absorvem para fazer a fotossíntese?","Dióxido de carbono","Oxigénio","Azoto","Hélio","As plantas absorvem CO₂ e libertam oxigénio."],
+[1,"Qual é o maior animal do mundo?","Baleia-azul","Elefante-africano","Cachalote","Tubarão-baleia","A baleia-azul pode ultrapassar os 30 metros de comprimento."],
+[2,"Qual é o símbolo químico do ouro?","Au","Ag","Or","Go","Vem do latim aurum. Ag é a prata."],
+[2,"Qual é, aproximadamente, a velocidade da luz no vácuo?","300 000 km/s","30 000 km/s","3 000 000 km/s","150 000 km/s","São cerca de 299 792 km por segundo."],
+[2,"Quantos corações tem um polvo?","3","1","2","8","Dois bombeiam sangue para as brânquias e um para o resto do corpo."],
+[2,"Que órgão produz a insulina?","Pâncreas","Fígado","Rins","Estômago","A insulina é produzida nas ilhotas de Langerhans do pâncreas."],
+[1,"Quem formulou a teoria da relatividade?","Albert Einstein","Isaac Newton","Galileu Galilei","Nikola Tesla","A relatividade restrita é de 1905 e a geral de 1915."],
+[3,"Que planeta tem mais luas conhecidas?","Saturno","Júpiter","Úrano","Neptuno","Em 2025 foram confirmadas 128 novas luas de Saturno, que passou a ter 274."],
+[2,"Quem descobriu a penicilina?","Alexander Fleming","Louis Pasteur","Marie Curie","Robert Koch","Fleming descobriu-a por acaso em 1928."],
+[1,"A que temperatura ferve a água ao nível do mar?","100 °C","90 °C","80 °C","120 °C","Em altitude, a água ferve a temperaturas mais baixas."],
+[2,"Qual é o maior órgão do corpo humano?","A pele","O fígado","O intestino","Os pulmões","A pele de um adulto ocupa cerca de 2 m²."],
+[2,"Que partícula do átomo tem carga negativa?","Eletrão","Protão","Neutrão","Fotão","Os protões têm carga positiva e os neutrões não têm carga."],
+[3,"Qual é o elemento químico mais abundante no Universo?","Hidrogénio","Hélio","Oxigénio","Carbono","Cerca de três quartos da matéria normal do Universo é hidrogénio."],
+[1,"Qual é o animal terrestre mais rápido?","Chita","Leão","Cavalo","Antílope","A chita pode ultrapassar os 100 km/h em corridas curtas."],
+[3,"Que português recebeu o Prémio Nobel da Medicina, em 1949?","Egas Moniz","Abel Salazar","Ricardo Jorge","Júlio de Matos","Egas Moniz foi também pioneiro da angiografia cerebral."],
+[2,"Quantos cromossomas tem uma célula humana normal?","46","23","44","48","São 23 pares; as células sexuais têm apenas 23."],
+[3,"Em que planeta um dia dura mais do que um ano?","Vénus","Mercúrio","Marte","Neptuno","Vénus demora 243 dias terrestres a rodar sobre si e 225 a dar a volta ao Sol."],
+[1,"A baleia é que tipo de animal?","Mamífero","Peixe","Réptil","Anfíbio","As baleias respiram ar e amamentam as crias."],
+[2,"Qual foi o primeiro satélite artificial?","Sputnik 1","Explorer 1","Vostok 1","Apollo 1","A União Soviética lançou o Sputnik 1 em outubro de 1957."],
+[3,"Qual é a unidade de força no Sistema Internacional?","Newton","Joule","Watt","Pascal","O joule mede energia, o watt potência e o pascal pressão."]
+],
+ent:[
+[1,"Que filme de 1997 conta a história de um navio que afundou em 1912?","Titanic","Poseidon","Pearl Harbor","Dunkirk","Realizado por James Cameron, ganhou 11 Óscares."],
+[1,"Quem é considerada a «Rainha do Fado»?","Amália Rodrigues","Mariza","Dulce Pontes","Ana Moura","Amália levou o fado aos palcos de todo o mundo."],
+[2,"Quem venceu a Eurovisão de 2017 por Portugal?","Salvador Sobral","Conan Osíris","Cláudia Pascoal","Mariza","Com «Amar pelos Dois», composta por Luísa Sobral."],
+[2,"Quem realizou o filme «Parque Jurássico» (1993)?","Steven Spielberg","James Cameron","George Lucas","Ridley Scott","O filme baseia-se no livro de Michael Crichton."],
+[1,"Que banda de Liverpool gravou «Yesterday»?","The Beatles","The Rolling Stones","Queen","The Who","«Yesterday» foi lançada em 1965."],
+[2,"Quem era o vocalista dos Queen?","Freddie Mercury","Brian May","Roger Taylor","Mick Jagger","Brian May era o guitarrista; Mick Jagger é dos Rolling Stones."],
+[2,"Em que país foi filmada a trilogia «O Senhor dos Anéis»?","Nova Zelândia","Irlanda","Escócia","Canadá","O realizador Peter Jackson é neozelandês."],
+[3,"Qual foi a primeira longa-metragem de animação da Disney, em 1937?","Branca de Neve e os Sete Anões","Pinóquio","Cinderela","Bambi","Foi um enorme risco financeiro e um grande sucesso."],
+[2,"Que cantora fez a digressão «The Eras Tour»?","Taylor Swift","Beyoncé","Adele","Lady Gaga","Foi a digressão com maiores receitas da história; passou por Lisboa em 2024."],
+[2,"Que instrumento de 12 cordas acompanha tradicionalmente o fado?","Guitarra portuguesa","Bandolim","Cavaquinho","Viola braguesa","Tem 12 cordas organizadas em 6 pares."],
+[3,"Que filme sul-coreano ganhou o Óscar de Melhor Filme em 2020?","Parasitas","1917","Joker","Roma","Foi o primeiro filme não falado em inglês a vencer essa categoria."],
+[1,"Que série da Netflix se passa na cidade fictícia de Hawkins?","Stranger Things","Dark","Wednesday","The Witcher","A série estreou em 2016."],
+[1,"Quem é conhecido como o «Rei da Pop»?","Michael Jackson","Elvis Presley","Prince","Justin Bieber","Elvis Presley é conhecido como o «Rei do Rock»."],
+[2,"Que ator interpretou o capitão Jack Sparrow?","Johnny Depp","Orlando Bloom","Brad Pitt","Leonardo DiCaprio","Na saga «Piratas das Caraíbas», iniciada em 2003."],
+[3,"Que banda portuguesa canta «Contentores»?","Xutos & Pontapés","GNR","UHF","Táxi","Os Xutos & Pontapés formaram-se em 1978."],
+[2,"Quem compôs «As Quatro Estações»?","Antonio Vivaldi","Wolfgang A. Mozart","Johann S. Bach","Ludwig van Beethoven","Vivaldi era um compositor veneziano do período barroco."],
+[1,"Em que escola de magia estuda Harry Potter?","Hogwarts","Beauxbatons","Durmstrang","Ilvermorny","Hogwarts fica na Escócia, segundo os livros de J. K. Rowling."],
+[3,"Em que ano estreou o primeiro filme «Star Wars»?","1977","1980","1972","1983","Foi realizado por George Lucas."],
+[3,"Que festival de música se realiza no Parque da Bela Vista, em Lisboa?","Rock in Rio Lisboa","NOS Alive","Super Bock Super Rock","MEO Sudoeste","O NOS Alive realiza-se no Passeio Marítimo de Algés."],
+[1,"Quantas cordas tem uma guitarra clássica?","6","4","8","12","A guitarra clássica tem seis cordas, normalmente de nylon."],
+[3,"Que realizador português continuou a filmar depois dos 100 anos?","Manoel de Oliveira","João César Monteiro","António-Pedro Vasconcelos","Pedro Costa","Manoel de Oliveira morreu em 2015, com 106 anos."],
+[2,"Que repórter de banda desenhada tem um cão chamado Milu?","Tintim","Astérix","Lucky Luke","Spirou","Tintim foi criado pelo belga Hergé em 1929."]
+],
+des:[
+[1,"Quantos jogadores tem cada equipa de futebol em campo?","11","10","9","12","Dez jogadores de campo e um guarda-redes."],
+[1,"Em que ano Portugal venceu o Campeonato da Europa de futebol?","2016","2004","2012","2021","Portugal venceu a França por 1-0 na final, em Saint-Denis."],
+[2,"Quem marcou o golo de Portugal na final do Euro 2016?","Éder","Cristiano Ronaldo","Nani","Ricardo Quaresma","Éder marcou aos 109 minutos, no prolongamento."],
+[1,"De quantos em quantos anos se realizam os Jogos Olímpicos de verão?","4","2","3","5","A exceção recente foi Tóquio, adiado de 2020 para 2021."],
+[2,"Que atleta portuguesa foi campeã olímpica da maratona em 1988?","Rosa Mota","Fernanda Ribeiro","Aurora Cunha","Manuela Machado","Rosa Mota venceu em Seul."],
+[3,"Quem foi campeão olímpico da maratona em Los Angeles, em 1984?","Carlos Lopes","Rui Silva","Domingos Castro","António Pinto","Foi a primeira medalha de ouro olímpica de Portugal."],
+[1,"Quantos pontos vale um cesto marcado de fora da linha de três pontos?","3","2","4","1","No basquetebol, os lances livres valem 1 ponto."],
+[2,"Que torneio do Grand Slam de ténis se joga em relva?","Wimbledon","Roland Garros","US Open","Open da Austrália","Roland Garros joga-se em terra batida."],
+[3,"Que seleção venceu mais Campeonatos do Mundo de futebol, até ao Mundial de 2022?","Brasil","Alemanha","Itália","Argentina","O Brasil tinha cinco títulos: 1958, 1962, 1970, 1994 e 2002."],
+[2,"Quantos estilos fazem parte da prova de estilos individual na natação?","4","3","5","2","Mariposa, costas, bruços e livres."],
+[1,"Em que desporto se destacou Rafael Nadal?","Ténis","Golfe","Padel","Futebol","Nadal venceu Roland Garros 14 vezes."],
+[2,"Quanto tempo dura um jogo de andebol de seniores?","60 minutos","40 minutos","80 minutos","90 minutos","Duas partes de 30 minutos."],
+[3,"Que português foi campeão olímpico do triplo salto em Tóquio 2020?","Pedro Pichardo","Nelson Évora","Patrícia Mamona","Tiago Pereira","Pichardo saltou 17,98 m."],
+[3,"Em que Jogos Olímpicos Nelson Évora foi campeão do triplo salto?","Pequim 2008","Atenas 2004","Londres 2012","Rio 2016","Venceu com 17,67 m."],
+[2,"Em que clube Cristiano Ronaldo se estreou como profissional?","Sporting","Benfica","FC Porto","Nacional","Formou-se no Andorinha e no Nacional, mas estreou-se como sénior no Sporting."],
+[1,"De que cor é a camisola do líder da Volta a França?","Amarela","Verde","Rosa","Branca","No Giro de Itália, o líder veste a camisola rosa."],
+[1,"Quantos buracos tem um percurso de golfe completo?","18","9","12","20","Também há percursos de 9 buracos, jogados duas vezes."],
+[3,"Que ciclista português terminou no pódio do Giro de Itália em 2023?","João Almeida","Rui Costa","Rúben Guerreiro","Nelson Oliveira","João Almeida ficou em 3.º lugar."],
+[1,"Que cidade organizou os Jogos Olímpicos de 2024?","Paris","Los Angeles","Tóquio","Londres","Los Angeles recebe os Jogos de 2028."],
+[2,"Quantos jogadores tem cada equipa de voleibol em campo?","6","5","7","9","No voleibol de praia, joga-se dois contra dois."],
+[3,"Em que desporto se usa o termo «albatroz»?","Golfe","Ténis","Críquete","Bilhar","Um albatroz é fazer um buraco três pancadas abaixo do par."],
+[2,"Que piloto alemão ganhou sete títulos mundiais de Fórmula 1?","Michael Schumacher","Sebastian Vettel","Nico Rosberg","Niki Lauda","Lewis Hamilton também tem sete títulos."]
+],
+cul:[
+[1,"Quem escreveu «Os Lusíadas»?","Luís Vaz de Camões","Fernando Pessoa","Eça de Queirós","Gil Vicente","«Os Lusíadas» foi publicado em 1572."],
+[2,"Qual é o único escritor de língua portuguesa com Prémio Nobel da Literatura?","José Saramago","António Lobo Antunes","Jorge Amado","Fernando Pessoa","Saramago recebeu o prémio em 1998."],
+[1,"Quem pintou a «Mona Lisa»?","Leonardo da Vinci","Miguel Ângelo","Rafael","Botticelli","O quadro está exposto no Museu do Louvre, em Paris."],
+[2,"Em que bairro de Lisboa se vendem pastéis com receita secreta desde 1837?","Belém","Alfama","Chiado","Bairro Alto","A receita veio do Mosteiro dos Jerónimos."],
+[2,"Qual destes é um heterónimo de Fernando Pessoa?","Alberto Caeiro","Mário de Sá-Carneiro","Almada Negreiros","Cesário Verde","Os mais conhecidos são Alberto Caeiro, Ricardo Reis e Álvaro de Campos."],
+[2,"Quem escreveu «Os Maias»?","Eça de Queirós","Camilo Castelo Branco","Júlio Dinis","Almeida Garrett","Foi publicado em 1888."],
+[1,"Quantos dias tem um ano bissexto?","366","365","364","367","O dia extra é 29 de fevereiro."],
+[2,"Os portuenses são conhecidos por «tripeiros». Que prato está ligado a esse nome?","Tripas à moda do Porto","Francesinha","Bacalhau à Gomes de Sá","Caldo verde","Conta a tradição que o Porto deu a sua carne às naus e ficou com as tripas."],
+[1,"Quantas cores tem tradicionalmente o arco-íris?","7","5","6","8","Vermelho, laranja, amarelo, verde, azul, anil e violeta."],
+[2,"Quem pintou «Guernica»?","Pablo Picasso","Salvador Dalí","Joan Miró","Francisco Goya","Picasso pintou-o em 1937, depois do bombardeamento da cidade."],
+[3,"Que doce é típico de Aveiro?","Ovos moles","Pastéis de Tentúgal","Queijadas de Sintra","Travesseiros","Os ovos moles de Aveiro têm Indicação Geográfica Protegida."],
+[2,"Que língua tem mais falantes nativos no mundo?","Mandarim","Inglês","Espanhol","Hindi","O inglês tem mais falantes no total, contando os não nativos."],
+[3,"Quantos países fazem parte da Comunidade dos Países de Língua Portuguesa (CPLP)?","9","7","8","10","Angola, Brasil, Cabo Verde, Guiné-Bissau, Guiné Equatorial, Moçambique, Portugal, São Tomé e Príncipe e Timor-Leste."],
+[1,"Quantos lados tem um hexágono?","6","5","7","8","O pentágono tem 5 lados e o octógono 8."],
+[2,"Que arquiteto projetou o Pavilhão de Portugal da Expo 98?","Álvaro Siza Vieira","Tomás Taveira","Santiago Calatrava","Gonçalo Byrne","Calatrava projetou a Gare do Oriente."],
+[2,"Quem escreveu «A Casa dos Espíritos»?","Isabel Allende","Clarice Lispector","Gabriela Mistral","Sophia de Mello Breyner","Isabel Allende é uma escritora chilena."],
+[1,"Qual é o ingrediente principal do guacamole?","Abacate","Pepino","Ervilhas","Curgete","O guacamole é um molho de origem mexicana."],
+[1,"De que região vem o Vinho do Porto?","Douro","Alentejo","Dão","Minho","A Região Demarcada do Douro foi criada em 1756."],
+[3,"Em que museu está «O Jardim das Delícias Terrenas», de Bosch?","Museu do Prado, Madrid","Museu do Louvre, Paris","Museu Nacional de Arte Antiga, Lisboa","Galeria Uffizi, Florença","Em Lisboa está outra obra famosa de Bosch: «As Tentações de Santo Antão»."],
+[2,"Quantas casas tem um tabuleiro de xadrez?","64","48","81","100","São 8 linhas por 8 colunas."],
+[3,"Quem escreveu «O Cavaleiro da Dinamarca»?","Sophia de Mello Breyner Andresen","Florbela Espanca","Agustina Bessa-Luís","Alice Vieira","É um conto de Natal muito lido nas escolas."],
+[2,"Qual é a moeda do Japão?","Iene","Yuan","Won","Rupia","O yuan é da China e o won da Coreia do Sul."]
+],
+atu:[
+[1,"Que nome escolheu o Papa eleito em maio de 2025?","Leão XIV","Francisco II","João Paulo III","Bento XVII","Robert Prevost foi eleito a 8 de maio de 2025. Fonte: Vaticano."],
+[2,"Em que país nasceu o Papa Leão XIV?","Estados Unidos","Peru","Itália","Argentina","Nasceu em Chicago; tem também nacionalidade peruana por ter trabalhado no Peru."],
+[2,"Que força política venceu as eleições legislativas portuguesas de maio de 2025?","AD (PSD/CDS)","PS","Chega","Iniciativa Liberal","Luís Montenegro foi reconduzido como primeiro-ministro (maio de 2025)."],
+[3,"Que partido ficou em segundo lugar em número de deputados nas legislativas de 2025?","Chega","PS","Iniciativa Liberal","Livre","O Chega elegeu 60 deputados, mais dois do que o PS."],
+[1,"Que países ficaram sem eletricidade no grande apagão de 28 de abril de 2025?","Portugal e Espanha","França e Itália","Apenas Portugal","Espanha e Marrocos","O apagão afetou praticamente toda a Península Ibérica durante várias horas."],
+[2,"Que país venceu o Festival da Eurovisão de 2025?","Áustria","Suécia","Israel","Suíça","JJ venceu com «Wasted Love», em Basileia (maio de 2025)."],
+[1,"Que seleção venceu a Liga das Nações de futebol em 2025?","Portugal","Espanha","França","Alemanha","Portugal venceu a Espanha nos penáltis, em Munique (junho de 2025)."],
+[2,"Que clube venceu a Liga dos Campeões de 2024/25?","Paris Saint-Germain","Inter de Milão","Real Madrid","Arsenal","O PSG venceu o Inter por 5-0, em Munique (maio de 2025)."],
+[2,"Quem recebeu o Prémio Nobel da Paz de 2025?","María Corina Machado","Narges Mohammadi","Malala Yousafzai","Ales Bialiatski","A líder da oposição venezuelana foi distinguida em outubro de 2025."],
+[2,"Quem se tornou chanceler da Alemanha em maio de 2025?","Friedrich Merz","Olaf Scholz","Annalena Baerbock","Markus Söder","Merz, da CDU, sucedeu a Olaf Scholz."],
+[3,"Quem se tornou, em 2025, a primeira mulher a chefiar o governo do Japão?","Sanae Takaichi","Yuriko Koike","Seiko Noda","Yoko Kamikawa","Sanae Takaichi tomou posse em outubro de 2025."],
+[3,"Quem é primeiro-ministro do Canadá desde março de 2025?","Mark Carney","Justin Trudeau","Pierre Poilievre","Chrystia Freeland","Mark Carney, antigo governador do Banco de Inglaterra, sucedeu a Trudeau."],
+[1,"Quem venceu as eleições presidenciais portuguesas de 2026?","António José Seguro","André Ventura","Luís Marques Mendes","Henrique Gouveia e Melo","Seguro venceu a segunda volta, a 8 de fevereiro de 2026, com cerca de 66,8% dos votos. Fonte: RTP."],
+[3,"A segunda volta das presidenciais de 2026 foi a primeira desde que ano?","1986","1976","1996","2006","Em 1986, Mário Soares venceu Freitas do Amaral na segunda volta. Fonte: Renascença."],
+[2,"Que clube foi campeão nacional da I Liga em 2025/26, sem perder nenhum jogo?","FC Porto","Sporting","Benfica","SC Braga","Foi o 31.º título do FC Porto, com Francesco Farioli como treinador (maio de 2026)."],
+[3,"Que clube conquistou, de forma histórica, a Taça de Portugal de 2025/26?","Torreense","Sporting","Gil Vicente","Estoril","O Torreense, de Torres Vedras, venceu o Sporting na final (maio de 2026)."],
+[2,"Que país organizou a cimeira do clima COP30, em novembro de 2025?","Brasil","Emirados Árabes Unidos","Egito","Azerbaijão","A COP30 realizou-se em Belém do Pará, na Amazónia."],
+[1,"Que três países organizaram o Mundial de futebol de 2026?","Estados Unidos, Canadá e México","Espanha, Portugal e Marrocos","Brasil, Argentina e Uruguai","Japão, Coreia do Sul e China","Foi o primeiro Mundial com 48 seleções (junho e julho de 2026)."],
+[1,"Quem tomou posse como Presidente dos Estados Unidos em janeiro de 2025?","Donald Trump","Joe Biden","Kamala Harris","JD Vance","Trump iniciou o segundo mandato a 20 de janeiro de 2025."]
+]};
+const QBANK=[];
+Object.entries(RAW).forEach(([k,arr])=>{const c=CATS.findIndex(x=>x.k===k);arr.forEach((r,i)=>QBANK.push({id:k+String(i+1).padStart(3,'0'),c,d:r[0],q:r[1],a:[r[2],r[3],r[4],r[5]],e:r[6]}));});
+
+const PCOLORS=['#ffffff','#ffd43b','#8ce99a','#74c0fc','#faa2c1','#ffa94d','#c0a6ff','#ff8787'];
+const LEVELS={cri:{n:'Criança',w:[.75,.25,0]},jov:{n:'Jovem',w:[.35,.5,.15]},adu:{n:'Adulto',w:[.2,.45,.35]}};
+const PTS=[0,10,20,30];
+const N=42, STEP=2*Math.PI/N;
+
+/* ================= UTILITÁRIOS ================= */
+const $=s=>document.querySelector(s);
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+const initial=p=>(p.name.trim()[0]||'?').toUpperCase();
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));window.scrollTo(0,0);if(id==='home')renderHome();if(id==='family')renderFamily();}
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>show(b.dataset.go));
+
+let soundOn=LS.get('tef_snd',true), actx=null;
+function beep(f=600,d=.08,type='sine',v=.08){if(!soundOn)return;try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();const o=actx.createOscillator(),g=actx.createGain();o.type=type;o.frequency.value=f;g.gain.value=v;g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+d);o.connect(g).connect(actx.destination);o.start();o.stop(actx.currentTime+d)}catch(e){}}
+const sfx={ok(){beep(660,.12);setTimeout(()=>beep(880,.18),110)},bad(){beep(220,.25,'square',.05)},step(){beep(520,.04,'triangle',.05)},win(){[523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,.22),i*130))},card(){beep(740,.1,'triangle');setTimeout(()=>beep(980,.12,'triangle'),90)}};
+
+let toastT=null;
+function toast(t){const el=$('#toast');el.textContent=t;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>el.hidden=true,2600)}
+
+/* ================= TABULEIRO ================= */
+function sqInfo(i){const k=Math.floor(i/6),o=i%6;if(o===0)return{t:'hq',c:k};if(o===3)return{t:k%2===0?'sur':'duel',c:null};return{t:'n',c:(k+{1:2,2:3,4:5,5:6}[o])%7}}
+function sqLabel(i){const s=sqInfo(i);if(s.t==='hq')return'Sede de '+CATS[s.c].n;if(s.t==='sur')return'Casa surpresa';if(s.t==='duel')return'Casa de duelo';return CATS[s.c].n}
+function sqColor(i){const s=sqInfo(i);return s.t==='sur'?'#ffcf4a':s.t==='duel'?'#e9e4d6':CATS[s.c].c}
+const ang=i=>-Math.PI/2+i*STEP;
+const pt=(r,a)=>[500+r*Math.cos(a),500+r*Math.sin(a)];
+function sector(a0,a1,r0,r1){const[x0,y0]=pt(r1,a0),[x1,y1]=pt(r1,a1),[x2,y2]=pt(r0,a1),[x3,y3]=pt(r0,a0);const lg=(a1-a0)>Math.PI?1:0;return`M${x0.toFixed(1)} ${y0.toFixed(1)}A${r1} ${r1} 0 ${lg} 1 ${x1.toFixed(1)} ${y1.toFixed(1)}L${x2.toFixed(1)} ${y2.toFixed(1)}A${r0} ${r0} 0 ${lg} 0 ${x3.toFixed(1)} ${y3.toFixed(1)}Z`}
+function buildBoard(svg,interactive){
+  let h=`<defs><radialGradient id="tbl${interactive?1:0}" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#1c5466"/><stop offset="1" stop-color="#0d2e3a"/></radialGradient></defs>`;
+  h+=`<circle cx="500" cy="500" r="496" fill="url(#tbl${interactive?1:0})" stroke="#2c6578" stroke-width="4"/>`;
+  // caminhos das sedes até ao centro
+  for(let k=0;k<7;k++){const a=ang(k*6),[x0,y0]=pt(150,a),[x1,y1]=pt(355,a);h+=`<line x1="${x0}" y1="${y0}" x2="${x1}" y2="${y1}" stroke="${CATS[k].c}" stroke-opacity=".28" stroke-width="30" stroke-linecap="round"/>`}
+  h+=`<circle cx="500" cy="500" r="300" fill="none" stroke="#2c6578" stroke-width="3" stroke-dasharray="4 10"/>`;
+  for(let i=0;i<N;i++){const s=sqInfo(i),hq=s.t==='hq',g=.011;const a0=ang(i)-STEP/2+g,a1=ang(i)+STEP/2-g;
+    h+=`<path class="sq" data-i="${i}" d="${sector(a0,a1,hq?352:372,hq?490:468)}" fill="${sqColor(i)}" stroke="#0b2530" stroke-width="3"><title>${esc(sqLabel(i))}</title></path>`;
+    const [tx,ty]=pt(hq?421:420,ang(i));
+    if(hq)h+=`<circle cx="${tx}" cy="${ty}" r="30" fill="#fff" fill-opacity=".9" pointer-events="none"/><text class="sqtxt" x="${tx}" y="${ty+11}" text-anchor="middle" font-size="${CATS[s.c].s.length>1?26:32}">${CATS[s.c].s}</text>`;
+    else if(s.t==='sur')h+=`<text class="sqtxt" x="${tx}" y="${ty+13}" text-anchor="middle" font-size="40">?</text>`;
+    else if(s.t==='duel')h+=`<text class="sqtxt" x="${tx}" y="${ty+9}" text-anchor="middle" font-size="24">VS</text>`;
+  }
+  // centro: roda de peças do jogador atual
+  for(let k=0;k<7;k++){const a0=ang(0)+k*2*Math.PI/7-Math.PI/7+.03,a1=a0+2*Math.PI/7-.06;h+=`<path class="wedge" data-k="${k}" d="${sector(a0,a1,74,152)}" fill="${CATS[k].c}" fill-opacity=".22" stroke="${CATS[k].c}" stroke-width="3"/>`}
+  h+=`<circle id="hub${interactive?'':'P'}" cx="500" cy="500" r="64" fill="#fbf8f0" stroke="#0b2530" stroke-width="4"/>`;
+  h+=`<text x="500" y="496" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="800" font-size="17" fill="#10232a" pointer-events="none">QUEM SABE</text><text x="500" y="517" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="800" font-size="17" fill="#10232a" pointer-events="none">MAIS?</text>`;
+  h+=`<g id="pawns${interactive?'':'P'}"></g>`;
+  svg.innerHTML=h;
+}
+function renderPawns(){
+  const g=$('#pawns');if(!g||!G)return;
+  if(g.childElementCount!==G.players.length){g.innerHTML=G.players.map((p,i)=>`<g class="pawn" id="pawn${i}"><circle r="21" fill="${p.color}" stroke="#0b2530" stroke-width="5"/><circle r="21" fill="none" stroke="#fff" stroke-width="2" opacity=".85"/><text y="8" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="800" font-size="23" fill="#0b2530">${esc(initial(p))}</text></g>`).join('')}
+  const groups={};G.players.forEach((p,i)=>{(groups[p.pos]=groups[p.pos]||[]).push(i)});
+  Object.entries(groups).forEach(([pos,ids])=>{pos=+pos;let bx,by;if(pos===-1){bx=500;by=500}else{[bx,by]=pt(420,ang(pos))}
+    ids.forEach((pi,j)=>{let x=bx,y=by;if(ids.length>1){const r=ids.length>4?30:24,a=2*Math.PI*j/ids.length;x+=r*Math.cos(a);y+=r*Math.sin(a)}
+      const el=$('#pawn'+pi);el.style.transform=`translate(${x}px,${y}px)`;});});
+  // jogador atual por cima
+  const cur=$('#pawn'+G.turn);if(cur&&cur.parentNode.lastChild!==cur)cur.parentNode.appendChild(cur);
+}
+function renderWedges(){const p=curP();document.querySelectorAll('#board .wedge').forEach(w=>{const k=+w.dataset.k,has=p.pieces.includes(k);w.setAttribute('fill-opacity',has?'1':'.16')})}
+function clearDest(){document.querySelectorAll('#board .dest').forEach(e=>e.classList.remove('dest'))}
+
+/* ================= DADO ================= */
+const PIPS={1:[5],2:[1,9],3:[1,5,9],4:[1,3,7,9],5:[1,3,5,7,9],6:[1,3,4,6,7,9]};
+function buildDie(){$('#die').innerHTML=[1,2,3,4,5,6].map(v=>`<div class="face f${v}">${PIPS[v].map(c=>`<span style="grid-row:${Math.ceil(c/3)};grid-column:${(c-1)%3+1}"></span>`).join('')}</div>`).join('')}
+const FACE={1:[0,0],6:[0,180],3:[0,-90],4:[0,90],2:[-90,0],5:[90,0]};
+let dieTurns=0;
+function spinDie(v){dieTurns+=2;const[x,y]=FACE[v];$('#die').style.transform=`rotateX(${x+360*dieTurns}deg) rotateY(${y+360*(dieTurns+1)}deg)`}
+
+/* ================= HISTÓRICO / ANTI-REPETIÇÃO ================= */
+let HIST=LS.get('tef_hist',{}), PSEEN=LS.get('tef_pseen',{});
+function rollDiff(level){const w=LEVELS[level].w,r=Math.random();return r<w[0]?1:r<w[0]+w[1]?2:3}
+function pickQ(cat,p,forceDiff){
+  let pool=QBANK.filter(q=>q.c===cat&&!G.used.includes(q.id));
+  if(!pool.length){G.used=G.used.filter(id=>!id.startsWith(CATS[cat].k));pool=QBANK.filter(q=>q.c===cat)}
+  const want=forceDiff||rollDiff(p.level),now=Date.now(),seen=PSEEN[p.name]||[];
+  let best=[],bk=1e9;
+  for(const q of pool){const h=HIST[q.id];let tier=0;if(h){const days=(now-h.t)/864e5;tier=days<30?3:days<90?2:1}
+    if(seen.includes(q.id))tier=Math.max(tier,2);
+    const key=tier*3+Math.abs(q.d-want);if(key<bk){bk=key;best=[q]}else if(key===bk)best.push(q)}
+  return rnd(best);
+}
+function useQ(q,p){if(q.c==='fam'){const f=LS.get('tef_fam',[]);const it=f.find(x=>x.id===q.id);if(it){it.n=(it.n||0)+1;LS.set('tef_fam',f)}return}
+  if(!G.used.includes(q.id))G.used.push(q.id);const h=HIST[q.id]||{n:0};HIST[q.id]={t:Date.now(),n:h.n+1};LS.set('tef_hist',HIST);
+  const s=PSEEN[p.name]=PSEEN[p.name]||[];if(!s.includes(q.id)){s.push(q.id);if(s.length>3000)s.shift()}LS.set('tef_pseen',PSEEN)}
+
+/* ================= FOLHA (perguntas e mensagens) ================= */
+let qTimer=null;
+function openSheet(html,color){const c=$('#scard');c.style.setProperty('--cc',color||'#1d6f86');c.innerHTML=html;$('#sheet').hidden=false;c.scrollTop=0;const f=c.querySelector('button:not(:disabled)');if(f)f.focus({preventScroll:true})}
+function closeSheet(){stopTimer();$('#sheet').hidden=true}
+function stopTimer(){if(qTimer)cancelAnimationFrame(qTimer);qTimer=null}
+function runTimer(sec,onEnd){stopTimer();const fill=$('#tfill'),num=$('#tnum');if(!fill)return;const t0=performance.now();
+  const tick=()=>{const left=sec-(performance.now()-t0)/1000;fill.style.width=Math.max(0,left/sec*100)+'%';fill.classList.toggle('low',left<5);if(num)num.textContent=Math.max(0,Math.ceil(left))+' s';
+    if(left<=0){qTimer=null;onEnd();return}qTimer=requestAnimationFrame(tick)};qTimer=requestAnimationFrame(tick)}
+function message({title,body='',color,card,buttons=[]}){
+  let h=`<div class="mband"></div><h2 class="mtitle">${title}</h2>`;
+  if(card)h+=`<div class="playcard"><div class="k">Carta surpresa</div><h3>${card.t}</h3><div>${card.d}</div></div>`;
+  if(body)h+=`<div class="sbody">${body}</div>`;
+  h+=`<div class="sbtns">${buttons.map((b,i)=>`<button class="btn ${b.cls||''}" data-b="${i}" ${b.color?`style="--cc:${b.color}"`:''}>${esc(b.label)}</button>`).join('')}</div>`;
+  openSheet(h,color);
+  document.querySelectorAll('#scard [data-b]').forEach(el=>el.onclick=()=>{const b=buttons[+el.dataset.b];if(!b.keep)closeSheet();b.fn&&b.fn()});
+}
+function showQuestion(q,o){
+  const cat=q.c==='fam'?FAMCAT:CATS[q.c],p=o.player,order=shuffle([0,1,2,3]),L='ABCD';
+  let secondUsed=false,done=false;
+  openSheet(`<div class="qhead"><div><div class="qmeta" style="text-align:left">${esc(o.tag||'Pergunta')}</div><div class="qcat">${cat.n}</div></div><div class="qmeta">${esc(p.name)}<br>${'●'.repeat(q.d)}${'○'.repeat(3-q.d)}</div></div>
+   ${o.timer?'<div class="tbar"><i id="tfill"></i></div><div class="tnum" id="tnum"></div>':''}
+   <h2 class="qtext">${esc(q.q)}</h2>
+   <div class="opts">${order.map((k,j)=>`<button class="opt" data-k="${k}"><b>${L[j]}</b><span>${esc(q.a[k])}</span></button>`).join('')}</div>
+   <div id="qfoot"></div>`,cat.c);
+  useQ(q,p);
+  const btns=[...document.querySelectorAll('#scard .opt')];
+  const answer=k=>{if(done)return;stopTimer();const ok=k===0;
+    if(o.hidden){done=true;btns.forEach(b=>{b.disabled=true;if(+b.dataset.k===k)b.classList.add('picked')});beep(500,.06);setTimeout(()=>{closeSheet();o.onAnswer(ok)},450);return}
+    if(!ok&&o.allowSecond&&p.cards.seg>0&&!secondUsed){
+      const chosen=btns.find(b=>+b.dataset.k===k);if(chosen){chosen.disabled=true;chosen.classList.add('wrong')}sfx.bad();
+      $('#qfoot').innerHTML=`<p class="verdict no">${k===-1?'Acabou o tempo.':'Resposta errada.'}</p><p class="expl">Tem a carta Segunda oportunidade. Quer tentar outra vez?</p><div class="sbtns" style="padding:0"><button class="btn primary" id="useSec">Usar segunda oportunidade</button><button class="btn" id="noSec">Não usar</button></div>`;
+      $('#useSec').onclick=()=>{secondUsed=true;p.cards.seg--;$('#qfoot').innerHTML='';renderPlayers();if(o.timer)runTimer(o.timer,()=>answer(-1))};
+      $('#noSec').onclick=()=>reveal(k);return}
+    reveal(k)};
+  const reveal=k=>{done=true;const ok=k===0;btns.forEach(b=>{b.disabled=true;const bk=+b.dataset.k;if(bk===0)b.classList.add('right');else if(bk===k)b.classList.add('wrong');else b.classList.add('off')});
+    ok?sfx.ok():sfx.bad();
+    const v=`<p class="verdict ${ok?'ok':'no'}">${ok?'Certo!':k===-1?'Acabou o tempo.':'Errado.'}</p>`;
+    if(o.quick){$('#qfoot').innerHTML=v;setTimeout(()=>{closeSheet();o.onAnswer(ok)},1300);return}
+    $('#qfoot').innerHTML=`${v}${q.e?`<p class="expl">${esc(q.e)}</p>`:''}<div class="sbtns" style="padding:0"><button class="btn primary" id="qcont">Continuar</button></div>`;
+    $('#qcont').focus({preventScroll:true});$('#qcont').onclick=()=>{closeSheet();o.onAnswer(ok)}};
+  btns.forEach(b=>b.onclick=()=>answer(+b.dataset.k));
+  if(o.timer)runTimer(o.timer,()=>answer(-1));
+}
+
+/* ================= ESTADO DO JOGO ================= */
+let G=null;
+const curP=()=>G.players[G.turn];
+const ready=p=>p.pieces.length>=G.need;
+function save(){if(G&&!G.over)LS.set('tef_save',G)}
+
+function renderAll(){renderPawns();renderWedges();renderPlayers();document.querySelectorAll('#board .sq.cur').forEach(e=>e.classList.remove('cur'));const p=curP();if(p.pos>=0){const s=document.querySelector(`#board .sq[data-i="${p.pos}"]`);s&&s.classList.add('cur')}}
+function miniPie(pieces){let h='<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true">';for(let k=0;k<7;k++){const a0=-Math.PI/2+k*2*Math.PI/7,a1=a0+2*Math.PI/7;const p0=[20+18*Math.cos(a0),20+18*Math.sin(a0)],p1=[20+18*Math.cos(a1),20+18*Math.sin(a1)];h+=`<path d="M20 20L${p0[0].toFixed(2)} ${p0[1].toFixed(2)}A18 18 0 0 1 ${p1[0].toFixed(2)} ${p1[1].toFixed(2)}Z" fill="${pieces.includes(k)?CATS[k].c:'#173f4d'}" stroke="#0f2f3b" stroke-width="1.5"/>`}return h+'</svg>'}
+function renderPlayers(){
+  $('#players').innerHTML=G.players.map((p,i)=>{const held=[];if(p.cards.seg)held.push('2.ª oportunidade'+(p.cards.seg>1?' ×'+p.cards.seg:''));if(p.cards.dob)held.push('Dobro'+(p.cards.dob>1?' ×'+p.cards.dob:''));if(p.cards.esc)held.push('Escudo'+(p.cards.esc>1?' ×'+p.cards.esc:''));
+    return`<div class="pcard ${i===G.turn?'cur':''}"><span class="dot" style="--pc:${p.color}">${esc(initial(p))}</span><div><div class="nm">${esc(p.name)}</div><div class="sub">${LEVELS[p.level].n} · ${p.pieces.length}/${G.need} peças · ${p.correct}/${p.answered} certas</div>${held.length?`<div class="held">${held.map(h=>`<span>${h}</span>`).join('')}</div>`:''}</div><div style="display:flex;align-items:center;gap:8px">${miniPie(p.pieces)}<div class="pts">${p.points}<small>pontos</small></div></div></div>`}).join('');
+}
+function setWho(){const p=curP();$('#who').innerHTML=`<span class="dot" style="--pc:${p.color}">${esc(initial(p))}</span><div><div class="eyebrow">Vez de</div><div class="pname">${esc(p.name)}</div></div>`}
+
+function startTurn(extra){
+  G.phase='roll';save();renderAll();setWho();clearDest();
+  const p=curP();
+  $('#act').innerHTML=`<button class="btn primary" id="rollBtn" style="font-size:1.1rem">Lançar dado</button>`;
+  $('#rollBtn').onclick=roll;
+  $('#msg').innerHTML=(extra?`<p style="margin:0 0 6px"><strong>${extra}</strong></p>`:'')+(ready(p)?`<p style="margin:0">Já tem ${G.need} peças. Lance o dado e escolha <strong>o centro</strong> para a pergunta final.</p>`:`<p style="margin:0">Faltam ${G.need-p.pieces.length} peças. As peças ganham-se a acertar nas sedes (casas grandes com letra).</p>`);
+}
+function nextPlayer(extra){G.turn=(G.turn+1)%G.players.length;startTurn(extra)}
+
+async function roll(){
+  if(G.phase!=='roll')return;G.phase='rolling';$('#rollBtn').disabled=true;
+  const v=1+Math.floor(Math.random()*6);spinDie(v);beep(300,.05,'triangle');setTimeout(()=>beep(360,.05,'triangle'),250);setTimeout(()=>beep(420,.05,'triangle'),500);
+  await sleep(1050);
+  const p=curP(),from=p.pos<0?0:p.pos;
+  const dests=[];const f=(from+v)%N,b=(from-v+N)%N;
+  dests.push({to:f,dir:1});if(b!==f)dests.push({to:b,dir:-1});
+  if(ready(p))dests.push({to:'C'});
+  G.phase='choose';G.dests=dests;G.roll=v;
+  dests.forEach(d=>{const el=d.to==='C'?$('#hub'):document.querySelector(`#board .sq[data-i="${d.to}"]`);el.classList.add('dest')});
+  $('#act').innerHTML=`<div class="rollnum">Saiu ${v}</div><div class="destbtns">${dests.map((d,i)=>d.to==='C'?`<button class="destbtn" data-d="${i}" style="--cc:#fbf8f0"><i></i>Ir ao centro · pergunta final</button>`:`<button class="destbtn" data-d="${i}" style="--cc:${sqColor(d.to)}"><i></i>${d.dir>0?'Avançar':'Recuar'} para ${esc(sqLabel(d.to))}</button>`).join('')}</div>`;
+  $('#msg').innerHTML='<p style="margin:0">Toque numa casa iluminada no tabuleiro ou escolha acima.</p>';
+  document.querySelectorAll('#act .destbtn').forEach(b=>b.onclick=()=>choose(G.dests[+b.dataset.d]));
+}
+async function choose(d){
+  if(G.phase!=='choose')return;G.phase='moving';clearDest();$('#act').innerHTML='<div class="rollnum">A andar…</div>';
+  const p=curP();
+  if(d.to==='C'){G.prevPos=p.pos;p.pos=-1;renderPawns();sfx.step();await sleep(300);return finalQuestion()}
+  let pos=p.pos<0?0:p.pos;
+  for(let s=0;s<G.roll;s++){pos=(pos+d.dir+N)%N;p.pos=pos;renderPawns();sfx.step();await sleep(170)}
+  renderAll();await sleep(250);resolve(p.pos);
+}
+function resolve(i){const s=sqInfo(i);
+  if(s.t==='hq')ask(s.c,{hq:true});else if(s.t==='n')ask(s.c,{});else if(s.t==='sur')drawCard();else startDuel();}
+
+function ask(c,ctx){const p=curP();const q=pickQ(c,p,ctx.diff);
+  const tag=ctx.final?'Pergunta final':ctx.hq?(p.pieces.includes(c)?'Sede (peça já conquistada)':'Sede · vale uma peça'):'Pergunta';
+  showQuestion(q,{player:p,timer:G.timer,allowSecond:true,tag,onAnswer:ok=>afterAnswer(ok,q,c,ctx)})}
+function addPoints(p,base){let pts=base,dbl=false;if(p.cards.dob>0){pts*=2;p.cards.dob--;dbl=true}p.points+=pts;return{pts,dbl}}
+function afterAnswer(ok,q,c,ctx){
+  const p=curP();p.answered++;
+  if(ok){p.correct++;const{pts,dbl}=addPoints(p,PTS[q.d]);
+    if(ctx.final)return victory(p);
+    if(ctx.hq&&!p.pieces.includes(c)){p.pieces.push(c);renderAll();confetti(80);sfx.win();
+      return message({title:'Peça conquistada!',color:CATS[c].c,body:`<p><strong>${esc(p.name)}</strong> ganhou a peça de <strong>${CATS[c].n}</strong> e ${pts} pontos${dbl?' (a dobrar)':''}.</p>${ready(p)?`<p>Já tem ${G.need} peças! Na próxima jogada pode ir ao centro responder à pergunta final.</p>`:''}`,buttons:[{label:'Jogar outra vez',cls:'primary',fn:()=>startTurn('Acertou! Jogue outra vez.')}]})}
+    renderPlayers();startTurn(`Acertou! +${pts} pontos${dbl?' (a dobrar)':''}. Jogue outra vez.`)
+  }else{
+    if(ctx.final){p.pos=G.prevPos;renderPawns()}
+    nextPlayer(`${esc(p.name)} errou. Passa a vez.`)
+  }
+}
+
+/* ===== Pergunta final ===== */
+function finalQuestion(){const p=curP();
+  message({title:'Pergunta final',color:'#fbf8f0',body:`<p>${esc(p.name)} está no centro. <strong>Os adversários escolhem a categoria</strong>. A pergunta é difícil: se acertar, ganha a partida.</p>`,
+    buttons:CATS.map((c,i)=>({label:c.n,cls:'catb',color:c.c,fn:()=>ask(i,{final:true,diff:3})}))})}
+function victory(p){G.over=true;LS.del('tef_save');renderAll();confetti(260);sfx.win();
+  const rank=G.players.map((x,i)=>({...x,i})).sort((a,b)=>b.pieces.length-a.pieces.length||b.points-a.points);
+  rank.sort((a,b)=>(b.name===p.name)-(a.name===p.name));
+  message({title:`${esc(p.name)} venceu!`,color:p.color,body:`<p>Acertou na pergunta final. Quem sabe mais? Hoje, foi ${esc(p.name)}.</p><table class="rank"><thead><tr><th>Jogador</th><th>Peças</th><th>Certas</th><th>Pontos</th></tr></thead><tbody>${rank.map(r=>`<tr><td><strong>${esc(r.name)}</strong></td><td>${r.pieces.length}</td><td>${r.correct}/${r.answered}</td><td>${r.points}</td></tr>`).join('')}</tbody></table>`,
+    buttons:[{label:'Nova partida',cls:'primary',fn:()=>{show('setup');renderSetup()}},{label:'Menu',fn:()=>show('home')}]})}
+
+/* ===== Cartas surpresa ===== */
+const CARDS=[
+  {id:'seg',w:3,t:'Segunda oportunidade',d:'Guarde esta carta. Quando errar uma pergunta, pode tentar outra vez.'},
+  {id:'dob',w:3,t:'Pontuação a dobrar',d:'A sua próxima resposta certa vale o dobro dos pontos.'},
+  {id:'esc',w:2,t:'Escudo',d:'Protege as suas peças da próxima tentativa de roubo.'},
+  {id:'rou',w:2,t:'Roubar uma peça',d:'Escolha um adversário e fique com uma peça que ele tem e a si lhe falta.'},
+  {id:'cat',w:3,t:'Escolha a categoria',d:'Escolha a categoria da sua próxima pergunta.'},
+  {id:'rel',w:2,t:'Desafio relâmpago',d:'Três perguntas seguidas, 10 segundos cada. 10 pontos por resposta certa; acertar as três dá 20 pontos extra e nova jogada.'},
+  {id:'tel',w:2,t:'Atalho para a sede',d:'Salte para a sede de uma categoria que lhe falta e responda logo à pergunta.'},
+  {id:'fam',w:3,t:'A Nossa Família',d:'Uma pergunta sobre a família. Se acertar, ganha 15 pontos e joga outra vez.'}
+];
+function drawCard(){const p=curP(),fam=LS.get('tef_fam',[]);
+  const deck=CARDS.filter(c=>c.id!=='fam'||fam.length);let tot=deck.reduce((s,c)=>s+c.w,0),r=Math.random()*tot,card=deck[0];for(const c of deck){if((r-=c.w)<0){card=c;break}}
+  sfx.card();const again=()=>startTurn('Carta guardada. Jogue outra vez.');
+  if(['seg','dob','esc'].includes(card.id))return message({title:'Casa surpresa',color:'#ffcf4a',card,buttons:[{label:'Guardar e jogar outra vez',cls:'primary',fn:()=>{p.cards[card.id]++;renderPlayers();again()}}]});
+  if(card.id==='rou'){const opp=G.players.filter((o,i)=>i!==G.turn&&o.pieces.some(k=>!p.pieces.includes(k)));
+    if(!opp.length)return message({title:'Casa surpresa',color:'#ffcf4a',card,body:'<p>Nenhum adversário tem peças que lhe faltem. Recebe 15 pontos de compensação.</p>',buttons:[{label:'Jogar outra vez',cls:'primary',fn:()=>{p.points+=15;startTurn('+15 pontos. Jogue outra vez.')}}]});
+    return message({title:'Casa surpresa',color:'#ffcf4a',card,body:'<p>A quem quer roubar uma peça?</p>',buttons:opp.map(o=>({label:o.name,cls:'catb',color:o.color,fn:()=>steal(o)}))})}
+  if(card.id==='cat')return message({title:'Casa surpresa',color:'#ffcf4a',card,buttons:CATS.map((c,i)=>({label:c.n,cls:'catb',color:c.c,fn:()=>ask(i,{})}))});
+  if(card.id==='rel')return message({title:'Casa surpresa',color:'#ffcf4a',card,buttons:[{label:'Começar o desafio',cls:'primary',fn:lightning}]});
+  if(card.id==='tel'){const miss=CATS.map((c,i)=>i).filter(i=>!p.pieces.includes(i));
+    if(!miss.length)return message({title:'Casa surpresa',color:'#ffcf4a',card,body:'<p>Já tem todas as peças. Recebe 20 pontos.</p>',buttons:[{label:'Jogar outra vez',cls:'primary',fn:()=>{p.points+=20;startTurn('+20 pontos. Jogue outra vez.')}}]});
+    const dist=i=>((i*6-p.pos)+N)%N;const target=miss.sort((a,b)=>dist(a)-dist(b))[0];
+    return message({title:'Casa surpresa',color:'#ffcf4a',card,body:`<p>Vai saltar para a <strong>sede de ${CATS[target].n}</strong>.</p>`,buttons:[{label:'Saltar',cls:'primary',fn:async()=>{p.pos=target*6;renderAll();sfx.step();await sleep(450);ask(target,{hq:true})}}]})}
+  if(card.id==='fam'){const f=shuffle(fam).sort((a,b)=>(a.n||0)-(b.n||0))[0];const q={id:f.id,c:'fam',d:2,q:f.q,a:f.a,e:f.e};
+    return message({title:'Casa surpresa',color:'#ffcf4a',card,buttons:[{label:'Responder',cls:'primary',fn:()=>showQuestion(q,{player:p,timer:G.timer,allowSecond:true,tag:'Carta surpresa',onAnswer:ok=>{p.answered++;if(ok){p.correct++;const{pts}=addPoints(p,15);startTurn(`Acertou! +${pts} pontos. Jogue outra vez.`)}else nextPlayer(`${esc(p.name)} errou. Passa a vez.`)}})}]})}
+}
+function steal(o){const p=curP();
+  if(o.cards.esc>0){o.cards.esc--;renderPlayers();return message({title:'Bloqueado pelo escudo',color:o.color,body:`<p>${esc(o.name)} usou o Escudo e protegeu as suas peças.</p>`,buttons:[{label:'Passar a vez',cls:'primary',fn:()=>nextPlayer()}]})}
+  const k=rnd(o.pieces.filter(x=>!p.pieces.includes(x)));o.pieces=o.pieces.filter(x=>x!==k);p.pieces.push(k);renderAll();sfx.win();
+  message({title:'Peça roubada!',color:CATS[k].c,body:`<p>${esc(p.name)} ficou com a peça de <strong>${CATS[k].n}</strong> de ${esc(o.name)}.</p>`,buttons:[{label:'Passar a vez',cls:'primary',fn:()=>nextPlayer()}]})}
+function lightning(){const p=curP();let n=0,hits=0;
+  const one=()=>{if(n===3){const bonus=hits===3?20:0;p.points+=hits*10+bonus;renderPlayers();
+      return message({title:`Desafio relâmpago: ${hits} de 3`,color:'#ffcf4a',body:`<p>Ganhou ${hits*10+bonus} pontos${bonus?' (inclui 20 extra)':''}.</p>`,buttons:[{label:hits===3?'Jogar outra vez':'Passar a vez',cls:'primary',fn:()=>hits===3?startTurn('Desafio perfeito! Jogue outra vez.'):nextPlayer()}]})}
+    n++;const c=Math.floor(Math.random()*7),q=pickQ(c,p);
+    showQuestion(q,{player:p,timer:10,quick:true,tag:`Relâmpago ${n} de 3`,onAnswer:ok=>{p.answered++;if(ok){p.correct++;hits++}one()}})};
+  one()}
+
+/* ===== Duelo ===== */
+function startDuel(){const p=curP(),opp=G.players.filter((o,i)=>i!==G.turn);
+  message({title:'Duelo!',color:'#e9e4d6',body:'<p>Escolha um adversário. Os dois respondem à mesma pergunta, à vez, sem ver a resposta do outro.</p><p>Se só um acertar, ganha 20 pontos. Se ambos acertarem, cada um ganha 10.</p>',buttons:opp.map(o=>({label:o.name,cls:'catb',color:o.color,fn:()=>duel(o)}))})}
+function duel(o){const p=curP(),c=Math.floor(Math.random()*7),q=pickQ(c,p,2);
+  showQuestion(q,{player:p,timer:G.timer,hidden:true,tag:'Duelo · responda em segredo',onAnswer:okA=>{
+    message({title:`Passe o telemóvel a ${esc(o.name)}`,color:o.color,body:'<p>Sem espreitar a resposta anterior.</p>',buttons:[{label:'Estou pronto',cls:'primary',fn:()=>{
+      showQuestion(q,{player:o,timer:G.timer,tag:'Duelo',onAnswer:okB=>duelEnd(p,o,okA,okB)})}}]})}})}
+function duelEnd(p,o,a,b){p.answered++;o.answered++;if(a)p.correct++;if(b)o.correct++;let t,next;
+  if(a&&b){p.points+=10;o.points+=10;t='Ambos acertaram: +10 pontos para cada um.';next=()=>startTurn('Duelo empatado. Jogue outra vez.')}
+  else if(a){p.points+=20;t=`${esc(p.name)} ganhou o duelo: +20 pontos.`;next=()=>startTurn('Ganhou o duelo! Jogue outra vez.')}
+  else if(b){o.points+=20;t=`${esc(o.name)} ganhou o duelo: +20 pontos.`;next=()=>nextPlayer()}
+  else{t='Ninguém acertou.';next=()=>nextPlayer()}
+  renderPlayers();message({title:'Resultado do duelo',color:'#e9e4d6',body:`<p>${esc(p.name)}: ${a?'certo':'errado'} · ${esc(o.name)}: ${b?'certo':'errado'}</p><p><strong>${t}</strong></p>`,buttons:[{label:'Continuar',cls:'primary',fn:next}]})}
+
+/* ================= CONFETTI ================= */
+function confetti(n){if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;const cv=$('#confetti'),ctx=cv.getContext('2d');cv.width=innerWidth;cv.height=innerHeight;
+  const cols=CATS.map(c=>c.c).concat(['#fff']);const ps=Array.from({length:n},()=>({x:innerWidth/2+(Math.random()-.5)*200,y:innerHeight*.35,vx:(Math.random()-.5)*14,vy:-Math.random()*14-4,s:6+Math.random()*7,r:Math.random()*6,vr:(Math.random()-.5)*.3,c:rnd(cols)}));
+  const t0=performance.now();const f=t=>{ctx.clearRect(0,0,cv.width,cv.height);ps.forEach(p=>{p.vy+=.35;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.r);ctx.fillStyle=p.c;ctx.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);ctx.restore()});if(t-t0<2800)requestAnimationFrame(f);else ctx.clearRect(0,0,cv.width,cv.height)};requestAnimationFrame(f)}
+
+/* ================= INÍCIO ================= */
+function renderHome(){
+  $('#btnResume').hidden=!LS.get('tef_save',null);
+  HIST=LS.get('tef_hist',{});const used=Object.keys(HIST).filter(id=>QBANK.some(q=>q.id===id)).length;const fam=LS.get('tef_fam',[]).length;
+  $('#homeStats').textContent=`${QBANK.length} perguntas no banco · ${QBANK.length-used} ainda por sair · ${fam} perguntas da família`;
+}
+$('#catChips').innerHTML=CATS.map(c=>`<span class="chip" style="--cc:${c.c}"><i></i>${c.n}</span>`).join('');
+$('#btnNew').onclick=()=>{show('setup');renderSetup()};
+$('#btnResume').onclick=()=>{const s=LS.get('tef_save',null);if(!s)return;G=s;enterGame()};
+$('#btnFamily').onclick=()=>show('family');
+const RULES=`<div class="mband"></div><h2 class="mtitle">Como jogar</h2><div class="rules">
+<h3>O objetivo</h3><p>Conquistar as peças das categorias (7 na partida completa, 4 na rápida), ir ao centro do tabuleiro e acertar na pergunta final.</p>
+<h3>Cada jogada</h3><ul><li>Lance o dado e escolha se avança ou recua.</li><li>A cor da casa define a categoria da pergunta.</li><li>Se acertar, ganha pontos (10, 20 ou 30 conforme a dificuldade) e joga outra vez.</li><li>Se errar, passa a vez.</li></ul>
+<h3>As casas</h3><ul><li><strong>Sedes</strong> (casas grandes com letra): acertar dá a peça dessa categoria.</li><li><strong>?</strong> Casa surpresa: tira uma carta (segunda oportunidade, dobro, escudo, roubo, relâmpago e outras).</li><li><strong>VS</strong> Casa de duelo: desafia um adversário para a mesma pergunta.</li></ul>
+<h3>Pergunta final</h3><p>Com as peças todas, qualquer lançamento permite ir ao centro. Os adversários escolhem a categoria. Se errar, volta à casa onde estava.</p>
+<h3>Níveis</h3><p>Criança, Jovem e Adulto mudam a mistura de perguntas fáceis, médias e difíceis de cada jogador. As perguntas não se repetem na mesma partida e o jogo prefere as que ainda não saíram nos últimos 30 e 90 dias.</p></div>
+<div class="sbtns"><button class="btn primary" id="closeRules">Fechar</button></div>`;
+const openRules=()=>{openSheet(RULES);$('#closeRules').onclick=closeSheet};
+$('#btnRules').onclick=openRules;$('#btnRules2').onclick=openRules;
+$('#btnClearHist').onclick=()=>message({title:'Limpar histórico?',body:'<p>O jogo volta a considerar todas as perguntas como novas.</p>',buttons:[{label:'Limpar',cls:'primary',fn:()=>{LS.del('tef_hist');LS.del('tef_pseen');HIST={};PSEEN={};renderHome();toast('Histórico limpo.')}},{label:'Cancelar'}]});
+
+/* ================= CONFIGURAÇÃO ================= */
+let SET={players:[{name:'Jogador 1',color:PCOLORS[0],level:'adu'},{name:'Jogador 2',color:PCOLORS[1],level:'adu'},{name:'Jogador 3',color:PCOLORS[2],level:'jov'}],need:7,timer:30};
+const lastSet=LS.get('tef_setup',null);if(lastSet)SET=lastSet;
+function seg(el,opts,val,onPick){el.innerHTML=opts.map(o=>`<button type="button" aria-pressed="${o.v===val}" data-v="${o.v}">${o.l}</button>`).join('');el.querySelectorAll('button').forEach(b=>b.onclick=()=>{onPick(JSON.parse(b.dataset.v));renderSetup()})}
+function renderSetup(){
+  $('#playerRows').innerHTML=SET.players.map((p,i)=>`<div class="prow"><button class="pcolor" data-i="${i}" style="background:${p.color}" aria-label="Mudar cor de ${esc(p.name)}">${esc((p.name.trim()[0]||'?').toUpperCase())}</button><input type="text" id="pn${i}" value="${esc(p.name)}" maxlength="16" aria-label="Nome do jogador ${i+1}"><select id="pl${i}" aria-label="Nível">${Object.entries(LEVELS).map(([k,l])=>`<option value="${k}" ${p.level===k?'selected':''}>${l.n}</option>`).join('')}</select><button class="iconbtn" data-del="${i}" aria-label="Remover" ${SET.players.length<=2?'disabled':''}>×</button></div>`).join('');
+  SET.players.forEach((p,i)=>{$('#pn'+i).oninput=e=>{p.name=e.target.value;document.querySelector(`.pcolor[data-i="${i}"]`).textContent=(p.name.trim()[0]||'?').toUpperCase()};$('#pl'+i).onchange=e=>p.level=e.target.value});
+  document.querySelectorAll('.pcolor').forEach(b=>b.onclick=()=>{const p=SET.players[+b.dataset.i];const taken=SET.players.map(x=>x.color);let j=PCOLORS.indexOf(p.color);for(let t=0;t<8;t++){j=(j+1)%8;if(!taken.includes(PCOLORS[j]))break}p.color=PCOLORS[j];renderSetup()});
+  document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{SET.players.splice(+b.dataset.del,1);renderSetup()});
+  $('#addPlayer').disabled=SET.players.length>=8;
+  seg($('#optNeed'),[{v:7,l:'7 · completa'},{v:4,l:'4 · rápida'}],SET.need,v=>SET.need=v);
+  seg($('#optTimer'),[{v:0,l:'Sem tempo'},{v:20,l:'20 s'},{v:30,l:'30 s'},{v:45,l:'45 s'}],SET.timer,v=>SET.timer=v);
+  seg($('#optSound'),[{v:true,l:'Ligado'},{v:false,l:'Desligado'}],soundOn,v=>{soundOn=v;LS.set('tef_snd',v)});
+  $('#setupErr').textContent='';
+}
+$('#addPlayer').onclick=()=>{if(SET.players.length>=8)return;const taken=SET.players.map(x=>x.color);SET.players.push({name:'Jogador '+(SET.players.length+1),color:PCOLORS.find(c=>!taken.includes(c)),level:'adu'});renderSetup()};
+$('#startGame').onclick=()=>{
+  const names=SET.players.map(p=>p.name.trim());
+  if(names.some(n=>!n)){$('#setupErr').textContent='Todos os jogadores precisam de um nome.';return}
+  if(new Set(names.map(n=>n.toLowerCase())).size!==names.length){$('#setupErr').textContent='Há nomes repetidos. Use nomes diferentes para o histórico de cada jogador funcionar.';return}
+  LS.set('tef_setup',SET);
+  G={players:SET.players.map((p,i)=>({name:p.name.trim(),color:p.color,level:p.level,pos:0,pieces:[],points:0,cards:{seg:0,dob:0,esc:0},correct:0,answered:0})),turn:Math.floor(Math.random()*SET.players.length),need:SET.need,timer:SET.timer,used:[],over:false};
+  enterGame();toast(`Começa ${G.players[G.turn].name}, sorteado ao acaso.`);
+};
+
+/* ================= JOGO: ENTRADA ================= */
+function enterGame(){show('game');buildBoard($('#board'),true);buildDie();
+  $('#board').onclick=e=>{if(G.phase!=='choose')return;const t=e.target.closest('.dest');if(!t)return;const d=t.id==='hub'?G.dests.find(x=>x.to==='C'):G.dests.find(x=>x.to===+t.dataset.i);if(d)choose(d)};
+  updSoundBtn();startTurn();}
+function updSoundBtn(){const b=$('#btnSound');b.textContent=soundOn?'Som: sim':'Som: não';b.setAttribute('aria-pressed',soundOn)}
+$('#btnSound').onclick=()=>{soundOn=!soundOn;LS.set('tef_snd',soundOn);updSoundBtn()};
+$('#btnExit').onclick=()=>{save();show('home');toast('Partida guardada. Pode continuar mais tarde.')};
+
+/* ================= A NOSSA FAMÍLIA ================= */
+function renderFamily(){const f=LS.get('tef_fam',[]);$('#famCount').textContent=`(${f.length})`;
+  $('#famList').innerHTML=f.length?f.map(x=>`<div class="famitem"><div><strong>${esc(x.q)}</strong><br><small>Certa: ${esc(x.a[0])} · Saiu ${x.n||0} vezes</small></div><button class="iconbtn" data-fdel="${x.id}" aria-label="Apagar">×</button></div>`).join(''):'<p class="stats">Ainda não há perguntas. Escreva a primeira acima.</p>';
+  document.querySelectorAll('[data-fdel]').forEach(b=>b.onclick=()=>{LS.set('tef_fam',LS.get('tef_fam',[]).filter(x=>x.id!==b.dataset.fdel));renderFamily()})}
+$('#famForm').onsubmit=e=>{e.preventDefault();const f=LS.get('tef_fam',[]);
+  f.push({id:'fam'+Date.now(),q:$('#fq').value.trim(),a:[0,1,2,3].map(i=>$('#fa'+i).value.trim()),e:$('#fe').value.trim(),n:0});LS.set('tef_fam',f);e.target.reset();renderFamily();toast('Pergunta guardada.')};
+
+/* ================= ARRANQUE ================= */
+buildBoard($('#previewBoard'),false);
+(()=>{const w=document.querySelectorAll('#previewBoard .wedge');[0,2,3,5].forEach(k=>w[k].setAttribute('fill-opacity','1'))})();
+renderHome();
+if('serviceWorker' in navigator){addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})})}
+</script>
+</body>
+</html>
