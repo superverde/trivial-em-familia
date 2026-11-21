@@ -381,7 +381,6 @@ body.client .gamewrap{grid-template-columns:minmax(0,1fr)}
 <canvas id="confetti"></canvas>
 
 <script src="perguntas.js"></script>
-<script src="lib/peerjs.min.js"></script>
 <script src="lib/qrcode.js"></script>
 <script>
 /* ================= DADOS ================= */
@@ -997,19 +996,58 @@ const newCode=()=>Array.from({length:5},()=>ALPH[Math.floor(Math.random()*ALPH.l
 const joinURL=c=>location.origin+location.pathname.replace(/index\.html$/,'')+'?sala='+c;
 const ICE={config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]}};
 (()=>{const srv=LS.get('tef_peersrv',null);if(srv)Object.assign(ICE,srv)})();
-const hasPeer=()=>typeof Peer!=='undefined';
+const hasPeer=()=>typeof WebSocket!=='undefined';
+/* Ligação através de uma ponte (servidor WebSocket no Render): funciona em qualquer rede.
+   As classes abaixo imitam a parte da biblioteca PeerJS que o jogo usa. */
+const RELAY_HTTP=LS.get('tef_relay','https://trivial-sala.onrender.com');
+const RELAY_WS=RELAY_HTTP.replace(/^http/,'ws');
+const wakeRelay=()=>{try{fetch(RELAY_HTTP+'/?t='+Date.now(),{mode:'no-cors',cache:'no-store'}).catch(()=>{})}catch(e){}};
+class Emitter{constructor(){this._h={}}on(e,f){(this._h[e]=this._h[e]||[]).push(f);return this}emit(e,...a){(this._h[e]||[]).slice().forEach(f=>{try{f(...a)}catch(err){console.error(err)}})}}
+class RConn extends Emitter{constructor(peer,id){super();this.peer=peer;this.peerId=id;this.open=false}send(d){this.peer._send(this.peerId,d)}close(){this.peer._closeConn(this.peerId)}}
+class Peer extends Emitter{
+  constructor(id){super();this.id=typeof id==='string'?id:null;this.isHost=!!this.id;this.open=false;this.destroyed=false;this.conns={};this.ws=null;this.tries=0;
+    if(this.isHost)this._dial(this.id.replace(/^tef-/,''),'host');else setTimeout(()=>{if(!this.destroyed){this.open=true;this.emit('open',NET.pid)}},0)}
+  _dial(room,role){if(this.destroyed)return;this.room=room;this.role=role;let ws;const prev=this.ws;this.ws=null;try{prev&&prev.close()}catch(e){}
+    try{ws=new WebSocket(`${RELAY_WS}/?room=${encodeURIComponent(room)}&role=${role}&id=${encodeURIComponent(NET.pid)}`)}catch(e){this.emit('error',{type:'network'});return}
+    this.ws=ws;const slow=setTimeout(()=>{if(ws.readyState!==1)this.emit('slow')},4000);
+    ws.onopen=()=>{clearTimeout(slow);this.tries=0};
+    ws.onmessage=ev=>{let o;try{o=JSON.parse(ev.data)}catch(e){return}this._msg(o)};
+    ws.onclose=()=>{clearTimeout(slow);if(this.destroyed||this.ws!==ws)return;this.open=false;
+      if(this.role==='host'){this.tries++;setTimeout(()=>this._dial(this.room,'host'),Math.min(8000,800*this.tries))}
+      else{const c=this.conns.host;if(c&&c.open){c.open=false;c.emit('close')}else if(c&&!this._noroom)this.emit('error',{type:'network'})}};
+    ws.onerror=()=>{}}
+  _msg(o){
+    if(this.isHost){
+      if(o.ev==='hosting'){if(!this.open){this.open=true;this.emit('open',this.id)}return}
+      if(o.ev==='taken'){this.destroyed=true;this.emit('error',{type:'unavailable-id'});return}
+      if(o.ev==='open'){let c=this.conns[o.id];if(!c){c=this.conns[o.id]=new RConn(this,o.id)}const was=c.open;c.open=true;if(!was){this.emit('connection',c);setTimeout(()=>c.emit('open'),0)}return}
+      if(o.ev==='close'){const c=this.conns[o.id];if(c){c.open=false;delete this.conns[o.id];c.emit('close')}return}
+      if(o.ev==='msg'){const c=this.conns[o.from];if(c)c.emit('data',o.data);return}
+    }else{const c=this.conns.host;if(!c)return;
+      if(o.ev==='joined'||o.ev==='hostback'){c.open=true;c.emit('open');return}
+      if(o.ev==='noroom'){this._noroom=true;this.emit('error',{type:'peer-unavailable'});return}
+      if(o.ev==='hostaway'){toastOnce('Quem criou a sala perdeu a ligação. A aguardar…');return}
+      if(o.ev==='msg'){c.emit('data',o.data);return}}
+  }
+  connect(target){const c=new RConn(this,'host');this.conns.host=c;this._noroom=false;this._dial(String(target).replace(/^tef-/,''),'client');return c}
+  _send(to,data){const ws=this.ws;if(!ws||ws.readyState!==1)return;ws.send(JSON.stringify(this.isHost?{to,data}:{data}))}
+  _closeConn(id){}
+  reconnect(){}
+  destroy(){this.destroyed=true;this.open=false;try{this.ws&&this.ws.close()}catch(e){}}
+}
 let LOB=LS.get('tef_lobby',{mode:'tv',need:7,timer:30,me:{name:'',level:'adu',color:PCOLORS[0]}});
 const saveLob=()=>LS.set('tef_lobby',LOB);
 
 /* ---------- anfitrião ---------- */
-function openLobby(){
+function openLobby(){wakeRelay();
   if(!hasPeer()){toast('Sem ligação à internet: não é possível criar a sala.');return}
   show('lobby');if(!NET.peer||NET.role!=='host'||NET.peer.destroyed)hostStart();renderLobby();
 }
 function hostStart(){
   netReset();NET.role='host';NET.on=true;NET.mode=LOB.mode;
-  const tryCode=()=>{NET.code=newCode();const peer=new Peer('tef-'+NET.code,ICE);NET.peer=peer;
+  const tryCode=()=>{NET.code=newCode();const peer=new Peer('tef-'+NET.code);NET.peer=peer;
     peer.on('open',()=>{renderLobby()});
+    peer.on('slow',()=>{if(!peer.open)$('#lobbyStatus').textContent='A acordar o servidor da sala… Na primeira vez pode demorar até 1 minuto.'});
     peer.on('error',e=>{if(e.type==='unavailable-id'){try{peer.destroy()}catch(_){}tryCode();return}
       if(e.type==='peer-unavailable')return;$('#lobbyStatus').textContent='Problema de ligação ('+e.type+'). Verifique a internet e tente de novo.'});
     peer.on('disconnected',()=>{try{peer.reconnect()}catch(_){}});
@@ -1115,7 +1153,8 @@ $('#jcode').onkeydown=e=>{if(e.key==='Enter')$('#jcodeGo').click()};
 $('#joinBack').onclick=()=>netLeave();
 function connectClient(code){
   netReset();NET.role='client';NET.code=code;$('#joinStatus').textContent='A ligar à sala '+code+'…';
-  const peer=new Peer(ICE);NET.peer=peer;
+  const peer=new Peer();NET.peer=peer;
+  peer.on('slow',()=>{if(!NET.on)$('#joinStatus').textContent='A acordar o servidor da sala… Na primeira vez pode demorar até 1 minuto.'});
   peer.on('open',()=>openConn());
   peer.on('error',e=>{if(e.type==='peer-unavailable'){$('#joinStatus').textContent=NET.started?'A sala não responde. A tentar de novo…':'Não encontrei a sala '+code+'. Confirme o código e que o jogo está aberto na TV ou no telemóvel de quem criou.';if(NET.started||NET.joined)retryConn();$('#joinCodeBox').hidden=false;return}
     $('#joinStatus').textContent='Problema de ligação ('+e.type+'). A tentar de novo…';retryConn()});
@@ -1201,6 +1240,7 @@ function netBoot(){
 buildBoard($('#previewBoard'),false);
 (()=>{const w=document.querySelectorAll('#previewBoard .wedge');[0,2,3,5].forEach(k=>w[k].setAttribute('fill-opacity','1'))})();
 renderHome();
+wakeRelay();
 netBoot();
 loadNews();
 if('serviceWorker' in navigator){let reloaded=false;const had=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!reloaded&&!(G&&$('#game').classList.contains('on'))){reloaded=true;location.reload()}});addEventListener('load',()=>{navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).catch(()=>{})})}

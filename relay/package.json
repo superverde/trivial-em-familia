@@ -1,0 +1,9 @@
+{
+  "name": "trivial-sala",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Ponte (relay) WebSocket para as salas do Trivial em Família",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "dependencies": { "ws": "8.18.0" }
+}
