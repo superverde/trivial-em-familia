@@ -234,7 +234,6 @@ label.lbl{display:block;font-weight:800;margin-bottom:6px}
         <div><label class="lbl">Peças para vencer</label><div class="seg" id="optNeed"></div></div>
         <div><label class="lbl">Tempo por pergunta</label><div class="seg" id="optTimer"></div></div>
         <div><label class="lbl">Som</label><div class="seg" id="optSound"></div></div>
-        <div><label class="lbl">Voz a comentar</label><div class="seg" id="optVoice"></div></div>
       </div>
     </section>
     <p class="stats" id="setupErr" style="color:var(--bad)"></p>
@@ -542,10 +541,8 @@ const REACT={
       [FUN.coins,['Ka-ching!','Pontos no bolso!','Isso vale ouro!'],1],
       [()=>FUN.applause(1.4),['Bravo!','Que espetáculo!','Toma lá cultura!'],1]]
 };
-function say(t,delay=0){if(!voiceOn||sndMode!=='fun'||!('speechSynthesis'in window)||!t)return;setTimeout(()=>{try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t),vs=speechSynthesis.getVoices();u.voice=vs.find(v=>v.lang==='pt-PT'||v.lang==='pt_PT')||vs.find(v=>v.lang&&v.lang.toLowerCase().startsWith('pt'))||null;u.lang='pt-PT';u.rate=1.05;u.pitch=1.15;speechSynthesis.speak(u)}catch(e){}},delay)}
+function say(t,delay=0){return;if(!voiceOn||sndMode!=='fun'||!('speechSynthesis'in window)||!t)return;setTimeout(()=>{try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t),vs=speechSynthesis.getVoices();u.voice=vs.find(v=>v.lang==='pt-PT'||v.lang==='pt_PT')||vs.find(v=>v.lang&&v.lang.toLowerCase().startsWith('pt'))||null;u.lang='pt-PT';u.rate=1.05;u.pitch=1.15;speechSynthesis.speak(u)}catch(e){}},delay)}
 if('speechSynthesis'in window){try{speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices()}catch(e){}}
-// desbloqueia a voz no iPhone ao primeiro toque
-document.addEventListener('click',()=>{try{if('speechSynthesis'in window){const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u)}}catch(e){}},{once:true});
 function pickW(list){const tot=list.reduce((a,x)=>a+x[2],0);let r=Math.random()*tot;for(const x of list){if((r-=x[2])<0)return x}return list[0]}
 const sfx={
   // reage a uma resposta: toca o som e devolve a frase a mostrar
@@ -671,7 +668,7 @@ function showQuestion(q,o){
   const reveal=k=>{done=true;const ok=k===0;btns.forEach(b=>{b.disabled=true;const bk=+b.dataset.k;if(bk===0)b.classList.add('right');else if(bk===k)b.classList.add('wrong');else b.classList.add('off')});
     const ph=sfx.react(ok,{quick:o.quick,timeout:k===-1});
     const base=ok?'Certo!':k===-1?'Acabou o tempo.':'Errado.';
-    const v=`<p class="verdict ${ok?'ok':'no'}">${ph?esc(ph)+' <span style="font-size:.8em;opacity:.7">'+base+'</span>':base}</p>`;
+    const v=`<p class="verdict ${ok?'ok':'no'}">${base}</p>`;
     if(o.quick){$('#qfoot').innerHTML=v;setTimeout(()=>{closeSheet();o.onAnswer(ok)},1300);return}
     $('#qfoot').innerHTML=`${v}${q.e?`<p class="expl">${esc(q.e)}</p>`:''}<div class="sbtns" style="padding:0"><button class="btn primary" id="qcont">Continuar</button></div>`;
     $('#qcont').focus({preventScroll:true});$('#qcont').onclick=()=>{closeSheet();o.onAnswer(ok)}};
@@ -845,7 +842,6 @@ function renderSetup(){
   seg($('#optNeed'),[{v:7,l:'7 · completa'},{v:4,l:'4 · rápida'}],SET.need,v=>SET.need=v);
   seg($('#optTimer'),[{v:0,l:'Sem tempo'},{v:20,l:'20 s'},{v:30,l:'30 s'},{v:45,l:'45 s'}],SET.timer,v=>SET.timer=v);
   seg($('#optSound'),[{v:'fun',l:'Engraçado'},{v:'simple',l:'Simples'},{v:'off',l:'Desligado'}],sndMode,v=>{sndMode=v;LS.set('tef_sndmode',v);if(v==='fun')sfx.react(Math.random()<.5,{quick:true});else if(v==='simple')beep(660,.12)});
-  seg($('#optVoice'),[{v:true,l:'Sim'},{v:false,l:'Não'}],voiceOn,v=>{voiceOn=v;LS.set('tef_voice',v);if(v)say('Olá família!')});
   $('#setupErr').textContent='';
 }
 $('#addPlayer').onclick=()=>{if(SET.players.length>=8)return;const taken=SET.players.map(x=>x.color);SET.players.push({name:'Jogador '+(SET.players.length+1),color:PCOLORS.find(c=>!taken.includes(c)),level:'adu'});renderSetup()};
