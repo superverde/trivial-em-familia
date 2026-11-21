@@ -212,6 +212,7 @@ label.lbl{display:block;font-weight:800;margin-bottom:6px}
 .locked .opt,.locked .btn,.locked .destbtn{opacity:.6}
 .waitnote{background:#10232a;color:#fbf8f0;font-weight:800;text-align:center;padding:8px 12px;font-size:.95rem}
 .waitnote.me{background:#1f9d62}
+.qwho{margin:0 20px;padding:8px 12px;border-radius:10px;background:#eef3f4;color:#1d4a57;font-weight:700;font-size:.92rem}
 body.client .die-scene,body.client #btnRules2,body.client #btnSound{display:none}
 body.client.noboard .boardbox{display:none}
 body.client.noboard .gamewrap{grid-template-columns:minmax(0,1fr);max-width:560px}
@@ -741,9 +742,25 @@ function showQuestion(q,o){
    ${o.timer?'<div class="tbar"><i id="tfill"></i></div><div class="tnum" id="tnum"></div>':''}
    <h2 class="qtext">${esc(q.q)}</h2>
    <div class="opts">${order.map((k,j)=>`<button class="opt" data-k="${k}"><b>${L[j]}</b><span>${esc(q.a[k])}</span></button>`).join('')}</div>
-   <div id="qfoot"></div>`,cat.c,String(G.players.indexOf(p)));
+   ${o.all?'<p class="qwho" id="qwho">Todos respondem! Quem tem a vez ganha os pontos todos; os outros ganham metade.</p>':''}
+   <div id="qfoot"></div>`,cat.c,o.all?'all':String(G.players.indexOf(p)));
   useQ(q,p);
   const btns=[...document.querySelectorAll('#scard .opt')];
+  // modo «todos respondem»: guarda a resposta de cada jogador e só revela no fim
+  const ans={},others=o.all?G.players.filter(x=>x!==p):[];let grace=null,finished=false;
+  const live=x=>x.pid===NET.pid?NET.mode==='phones':connOpen(x.pid);
+  const updWho=()=>{const el=$('#qwho');if(!el)return;const done=G.players.filter(x=>x.pid in ans).map(x=>esc(x.name));
+    el.innerHTML=(done.length?'Já responderam: <strong>'+done.join(', ')+'</strong>':'Todos respondem! Quem tem a vez ganha os pontos todos; os outros ganham metade.')+(grace?' · a fechar em breve…':'')};
+  const finishAll=()=>{if(finished)return;finished=true;clearTimeout(grace);grace=null;
+    const half=Math.round(PTS[q.d]/2),hits=[];
+    others.forEach(x=>{if(!(x.pid in ans))return;x.answered++;if(ans[x.pid]===0){x.correct++;x.points+=half;hits.push(esc(x.name))}});
+    o.othersHtml=others.length?`<p class="expl"><strong>Os outros:</strong> ${hits.length?hits.join(', ')+' acert'+(hits.length>1?'aram':'ou')+` (+${half} pontos)`:'ninguém acertou'}.</p>`:'';
+    const el=$('#qwho');if(el)el.remove();$('#scard').dataset.actor=String(G.players.indexOf(p));renderPlayers();
+    answer(p.pid in ans?ans[p.pid]:-1)};
+  const pick=(who,k)=>{if(finished||who in ans)return;ans[who]=k;beep(500,.04);updWho();
+    const waiting=others.filter(x=>live(x)&&!(x.pid in ans));
+    if(p.pid in ans){if(!waiting.length)return finishAll();if(!grace){grace=setTimeout(finishAll,10000);updWho()}}
+    else if(!waiting.length&&!live(p))finishAll()};
   const answer=k=>{if(done)return;stopTimer();const ok=k===0;
     if(o.hidden){done=true;btns.forEach(b=>{b.disabled=true;if(+b.dataset.k===k&&!NET.on)b.classList.add('picked')});beep(500,.06);setTimeout(()=>{closeSheet();o.onAnswer(ok)},450);return}
     if(!ok&&o.allowSecond&&p.cards.seg>0&&!secondUsed){
@@ -755,13 +772,14 @@ function showQuestion(q,o){
   const reveal=k=>{done=true;const ok=k===0;btns.forEach(b=>{b.disabled=true;const bk=+b.dataset.k;if(bk===0)b.classList.add('right');else if(bk===k)b.classList.add('wrong');else b.classList.add('off')});
     const ph=sfx.react(ok,{quick:o.quick,timeout:k===-1});
     const base=ok?'Certo!':k===-1?'Acabou o tempo.':'Errado.';
-    const v=`<p class="verdict ${ok?'ok':'no'}">${base}</p>`;
+    const v=`<p class="verdict ${ok?'ok':'no'}">${base}</p>${o.othersHtml||''}`;
     if(o.quick){$('#qfoot').innerHTML=v;setTimeout(()=>{closeSheet();o.onAnswer(ok)},1300);return}
     $('#qfoot').innerHTML=`${v}${q.e?`<p class="expl">${esc(q.e)}</p>`:''}<div class="sbtns" style="padding:0"><button class="btn primary" id="qcont">Continuar</button></div>`;
     $('#qcont').focus({preventScroll:true});$('#qcont').onclick=()=>{closeSheet();o.onAnswer(ok)}};
-  btns.forEach(b=>b.onclick=()=>answer(+b.dataset.k));
-  if(o.timer)runTimer(o.timer,()=>answer(-1));
+  btns.forEach(b=>b.onclick=()=>{if(o.all&&!finished){const who=CLICKER||(NET.mode==='phones'?NET.pid:p.pid);pick(who,+b.dataset.k);return}answer(+b.dataset.k)});
+  if(o.timer)runTimer(o.timer,()=>o.all&&!finished?finishAll():answer(-1));
 }
+let CLICKER=null;
 
 /* ================= ESTADO DO JOGO ================= */
 let G=null;
@@ -813,7 +831,7 @@ function resolve(i){const s=sqInfo(i);
 
 function ask(c,ctx){const p=curP();const q=pickQ(c,p,ctx.diff);
   const tag=ctx.final?'Pergunta final':ctx.hq?(p.pieces.includes(c)?'Sede (peça já conquistada)':'Sede · vale uma peça'):'Pergunta';
-  showQuestion(q,{player:p,timer:G.timer,allowSecond:true,tag,onAnswer:ok=>afterAnswer(ok,q,c,ctx)})}
+  showQuestion(q,{player:p,timer:G.timer,allowSecond:true,tag,all:!!(NET.on&&NET.started&&NET.role==='host'),onAnswer:ok=>afterAnswer(ok,q,c,ctx)})}
 function addPoints(p,base){let pts=base,dbl=false;if(p.cards.dob>0){pts*=2;p.cards.dob--;dbl=true}p.points+=pts;return{pts,dbl}}
 function afterAnswer(ok,q,c,ctx){
   const p=curP();p.answered++;
@@ -1045,7 +1063,7 @@ function startObserver(){if(OBS)OBS.disconnect();OBS=new MutationObserver(schedu
   OBS.observe($('#sheet'),{attributes:true});}
 function scheduleBroadcast(){if(!(NET.on&&NET.role==='host'&&NET.started))return;if(bTimer)return;bTimer=setTimeout(()=>{bTimer=null;broadcast()},200)}
 function actorNow(){if(!$('#sheet').hidden)return $('#scard').dataset.actor||'host';return G&&['roll','choose'].includes(G.phase)?String(G.turn):'none'}
-function canAct(actor,idx){if(idx<0)return false;if(actor==='any')return true;if(actor==='others')return idx!==G.turn;return actor===String(idx)}
+function canAct(actor,idx){if(idx<0)return false;if(actor==='any'||actor==='all')return true;if(actor==='others')return idx!==G.turn;return actor===String(idx)}
 function connOpen(pid){const c=NET.conns[pid];return !!(c&&c.open)}
 function broadcast(force){
   if(!G)return;
@@ -1064,7 +1082,7 @@ function broadcast(force){
 function hostClick(rid,pid){
   if(!G)return;const idx=G.players.findIndex(p=>p.pid===pid);const actor=actorNow();if(!canAct(actor,idx))return;
   const area=$('#sheet').hidden?$('#act'):$('#scard');const el=[...area.querySelectorAll('button')].find(b=>b.dataset.rid===rid);
-  if(el&&!el.disabled){const was=area.classList.contains('locked');area.classList.remove('locked');el.click();if(was)area.classList.add('locked')}
+  if(el&&!el.disabled){const was=area.classList.contains('locked');area.classList.remove('locked');CLICKER=pid;try{el.click()}finally{CLICKER=null}if(was)area.classList.add('locked')}
 }
 function netEnd(){if(NET.role==='host'){for(const k in NET.conns){const c=NET.conns[k];if(c.open)try{c.send({t:'end'})}catch(_){}}}
   setTimeout(()=>{try{NET.peer&&NET.peer.destroy()}catch(_){}netReset()},150);if(OBS)OBS.disconnect();document.body.classList.remove('tvhost');$('#roomTag').hidden=true}
@@ -1138,10 +1156,15 @@ function renderClient(d){
   bindClient($('#act'),!s.sheet&&mine);
   if(s.sheet){const c=$('#scard');c.style.setProperty('--cc',s.cc||'#1d6f86');
     let note='';const ap=/^\d+$/.test(actor)?G.players[+actor]:null;
-    if(mine)note=`<div class="waitnote me">${actor==='others'?'Escolha a categoria para o adversário':'É a sua vez de responder'}</div>`;
+    if(actor==='all'){const turnP=G.players[G.turn];note=`<div class="waitnote me">${me===G.turn?'É a sua pergunta: vale os pontos todos!':'Responda também! Vale metade dos pontos'+(turnP?' (a vez é de '+esc(turnP.name)+')':'')}</div>`}
+    else if(mine)note=`<div class="waitnote me">${actor==='others'?'Escolha a categoria para o adversário':'É a sua vez de responder'}</div>`;
     else if(ap)note=`<div class="waitnote">É a vez de ${esc(ap.name)}</div>`;
     else if(actor==='others')note='<div class="waitnote">Os adversários escolhem</div>';
-    c.innerHTML=note+s.sheet;$('#sheet').hidden=false;bindClient(c,mine);
+    c.innerHTML=note+s.sheet;$('#sheet').hidden=false;
+    const qt=(c.querySelector('.qtext')||{}).textContent||'';if(NET.pick&&NET.pick.q!==qt)NET.pick=null;
+    const already=actor==='all'&&NET.pick;bindClient(c,mine&&!already);
+    if(NET.pick){const pb=[...c.querySelectorAll('.opt')].find(b=>b.dataset.rid===NET.pick.rid);if(pb&&!pb.classList.contains('right')&&!pb.classList.contains('wrong'))pb.classList.add('picked')}
+    if(actor==='all')c.querySelectorAll('.opt').forEach(b=>{const r=b.dataset.rid;const old=b.onclick;if(old&&!already)b.onclick=()=>{NET.pick={q:qt,rid:r};old()}});
     if(mine&&!renderClient.wasMine){try{navigator.vibrate&&navigator.vibrate(120)}catch(_){}}
     renderClient.wasMine=mine;
   }else{$('#sheet').hidden=true;renderClient.wasMine=false}
