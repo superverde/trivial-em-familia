@@ -1,4 +1,4 @@
-// Banco de perguntas adicional (Trivial em Família)
+// Banco de perguntas adicional (Trivial em Família) - gerado por tools/build.js
 window.RAW_EXTRA={"his":[[1,"Em que dia se comemora o Dia de Portugal, de Camões e das Comunidades Portuguesas?","10 de Junho","25 de Abril","5 de Outubro","1 de Dezembro","A data assinala a morte de Luís Vaz de Camões, em 1580."],
 [1,"Que cidade é considerada o «berço da nação» portuguesa?","Guimarães","Braga","Coimbra","Porto","Diz-se que D. Afonso Henriques nasceu em Guimarães, onde está o castelo associado à fundação."],
 [2,"Em que batalha de 1128 D. Afonso Henriques venceu as tropas da mãe, D. Teresa?","São Mamede","Ourique","Aljubarrota","Valdevez","A batalha de São Mamede, perto de Guimarães, é considerada o início da independência."],
@@ -927,8 +927,8 @@ window.RAW_EXTRA={"his":[[1,"Em que dia se comemora o Dia de Portugal, de Camõe
 [2,"Que seleção venceu o Euro 2024, na Alemanha?","Espanha","Inglaterra","França","Alemanha","A Espanha venceu a Inglaterra por 2-1 na final, em Berlim."],
 [2,"Que clube venceu o primeiro Mundial de Clubes com 32 equipas, em 2025?","Chelsea","Paris Saint-Germain","Real Madrid","Manchester City","O Chelsea venceu o PSG por 3-0 na final, em Nova Jérsia."],
 [2,"Que treinador português regressou ao Benfica em setembro de 2025?","José Mourinho","Jorge Jesus","Rui Vitória","Bruno Lage","Mourinho tinha treinado o Benfica no ano 2000."],
-[2,"Quem é o selecionador nacional de futebol desde 2023?","Roberto Martínez","Fernando Santos","Paulo Bento","José Mourinho","O espanhol sucedeu a Fernando Santos."],
-[1,"Em que clube da Arábia Saudita joga Cristiano Ronaldo?","Al-Nassr","Al-Hilal","Al-Ittihad","Al-Ahli","Chegou ao Al-Nassr no início de 2023."],
+[2,"Quem foi o selecionador nacional de futebol entre 2023 e 2026?","Roberto Martínez","Fernando Santos","Paulo Bento","José Mourinho","Saiu depois da eliminação no Mundial de 2026; sucedeu-lhe Jorge Jesus."],
+[1,"Em que clube da Arábia Saudita jogava Cristiano Ronaldo em 2026?","Al-Nassr","Al-Hilal","Al-Ittihad","Al-Ahli","Chegou ao Al-Nassr no início de 2023."],
 [2,"Quem venceu o torneio masculino de Wimbledon em 2025?","Jannik Sinner","Carlos Alcaraz","Novak Djokovic","Alexander Zverev","Foi o primeiro italiano a vencer Wimbledon."],
 [2,"Que ciclista venceu a Volta a França de 2025?","Tadej Pogačar","Jonas Vingegaard","Remco Evenepoel","João Almeida","Foi a quarta vitória do esloveno no Tour."],
 [3,"Quem recebeu o Prémio Nobel da Literatura em 2025?","László Krasznahorkai","Han Kang","Haruki Murakami","Salman Rushdie","O escritor húngaro foi distinguido em outubro de 2025; Han Kang venceu em 2024."],
@@ -942,7 +942,7 @@ window.RAW_EXTRA={"his":[[1,"Em que dia se comemora o Dia de Portugal, de Camõe
 [2,"Que treinador levou o Sporting ao bicampeonato em 2024/25?","Rui Borges","Rúben Amorim","João Pereira","Jorge Jesus","Rui Borges chegou ao Sporting em dezembro de 2024."],
 [2,"Quem é presidente do FC Porto desde abril de 2024?","André Villas-Boas","Pinto da Costa","Fernando Gomes","Vítor Baía","Sucedeu a Pinto da Costa, que liderou o clube durante 42 anos."],
 [2,"Quem é vice-presidente dos Estados Unidos desde janeiro de 2025?","JD Vance","Kamala Harris","Mike Pence","Marco Rubio","Tomou posse com Donald Trump."],
-[2,"Quem é primeiro-ministro do Reino Unido desde julho de 2024?","Keir Starmer","Rishi Sunak","Boris Johnson","Liz Truss","O Partido Trabalhista venceu as eleições de julho de 2024."],
+[2,"Quem foi primeiro-ministro do Reino Unido de julho de 2024 a julho de 2026?","Keir Starmer","Rishi Sunak","Boris Johnson","Liz Truss","Demitiu-se em 2026 e foi substituído por Andy Burnham."],
 [2,"Quem se tornou, em outubro de 2024, a primeira mulher presidente do México?","Claudia Sheinbaum","Xóchitl Gálvez","Michelle Bachelet","Dilma Rousseff","Sucedeu a Andrés Manuel López Obrador."],
 [3,"Que organização japonesa de sobreviventes das bombas atómicas recebeu o Nobel da Paz de 2024?","Nihon Hidankyo","Cruz Vermelha do Japão","Médicos Sem Fronteiras","UNICEF","É formada por sobreviventes de Hiroxima e Nagasáqui."],
 [3,"Que escritora sul-coreana recebeu o Nobel da Literatura em 2024?","Han Kang","Shin Kyung-sook","Cho Nam-joo","Banana Yoshimoto","Foi a primeira autora sul-coreana a receber o prémio."],

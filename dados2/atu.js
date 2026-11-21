@@ -5,7 +5,7 @@ atu:[
 [2,"Que treinador levou o Sporting ao bicampeonato em 2024/25?","Rui Borges","Rúben Amorim","João Pereira","Jorge Jesus","Rui Borges chegou ao Sporting em dezembro de 2024."],
 [2,"Quem é presidente do FC Porto desde abril de 2024?","André Villas-Boas","Pinto da Costa","Fernando Gomes","Vítor Baía","Sucedeu a Pinto da Costa, que liderou o clube durante 42 anos."],
 [2,"Quem é vice-presidente dos Estados Unidos desde janeiro de 2025?","JD Vance","Kamala Harris","Mike Pence","Marco Rubio","Tomou posse com Donald Trump."],
-[2,"Quem é primeiro-ministro do Reino Unido desde julho de 2024?","Keir Starmer","Rishi Sunak","Boris Johnson","Liz Truss","O Partido Trabalhista venceu as eleições de julho de 2024."],
+[2,"Quem foi primeiro-ministro do Reino Unido de julho de 2024 a julho de 2026?","Keir Starmer","Rishi Sunak","Boris Johnson","Liz Truss","Demitiu-se em 2026 e foi substituído por Andy Burnham."],
 [2,"Quem se tornou, em outubro de 2024, a primeira mulher presidente do México?","Claudia Sheinbaum","Xóchitl Gálvez","Michelle Bachelet","Dilma Rousseff","Sucedeu a Andrés Manuel López Obrador."],
 [3,"Que organização japonesa de sobreviventes das bombas atómicas recebeu o Nobel da Paz de 2024?","Nihon Hidankyo","Cruz Vermelha do Japão","Médicos Sem Fronteiras","UNICEF","É formada por sobreviventes de Hiroxima e Nagasáqui."],
 [3,"Que escritora sul-coreana recebeu o Nobel da Literatura em 2024?","Han Kang","Shin Kyung-sook","Cho Nam-joo","Banana Yoshimoto","Foi a primeira autora sul-coreana a receber o prémio."],

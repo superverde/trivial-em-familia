@@ -569,6 +569,14 @@ Object.entries(RAW).forEach(([k,arr])=>{const c=CATS.findIndex(x=>x.k===k);arr.f
 const PCOLORS=['#ffffff','#ffd43b','#8ce99a','#74c0fc','#faa2c1','#ffa94d','#c0a6ff','#ff8787'];
 const LEVELS={cri:{n:'Criança',w:[.75,.25,0]},jov:{n:'Jovem',w:[.35,.5,.15]},adu:{n:'Adulto',w:[.2,.45,.35]}};
 const PTS=[0,10,20,30];
+/* Atualidades dinâmicas: perguntas aprovadas em atualidades.json, com data e fonte */
+function periodo(data){if(!data)return null;const d=(Date.now()-new Date(data+'T12:00:00').getTime())/864e5;return d<=7?'Últimos 7 dias':d<=30?'Últimos 30 dias':d<=365?'Últimos 12 meses':'Mais de um ano'}
+const dataPT=d=>{try{return new Date(d+'T12:00:00').toLocaleDateString('pt-PT',{day:'numeric',month:'short',year:'numeric'})}catch(e){return d}};
+async function loadNews(){try{const r=await fetch('atualidades.json',{cache:'no-cache'});if(!r.ok)return;const j=await r.json();let n=0;
+  (j.perguntas||[]).forEach(x=>{if(!x||!x.id||!Array.isArray(x.a)||x.a.length!==4)return;const age=(Date.now()-new Date(x.data+'T12:00:00').getTime())/864e5;if(age>548)return;
+    if(QBANK.some(q=>q.id==='n-'+x.id))return;QBANK.push({id:'n-'+x.id,c:6,d:x.d||2,q:x.q,a:x.a,e:x.e||'',fonte:x.fonte||'',url:x.url||'',data:x.data||''});n++});
+  NEWS_INFO={n,atualizado:j.atualizado||''};if($('#home').classList.contains('on'))renderHome()}catch(e){}}
+let NEWS_INFO=null;
 const N=42, STEP=2*Math.PI/N;
 
 /* ================= UTILITÁRIOS ================= */
@@ -714,7 +722,7 @@ function pickQ(cat,p,forceDiff){mergeHist();const extra=NET.seenExtra||null;
   let best=[],bk=1e9;
   for(const q of pool){const h=HIST[q.id];let tier=0;if(h){const days=(now-h.t)/864e5;tier=days<30?3:days<90?2:1}
     if(seen.includes(q.id)||(extra&&extra.has(q.id)))tier=Math.max(tier,2);
-    const key=tier*3+Math.abs(q.d-want);if(key<bk){bk=key;best=[q]}else if(key===bk)best.push(q)}
+    let key=tier*3+Math.abs(q.d-want);if(q.data){const age=(now-new Date(q.data+'T12:00:00').getTime())/864e5;if(age<=30&&tier===0)key-=2}if(key<bk){bk=key;best=[q]}else if(key===bk)best.push(q)}
   return rnd(best);
 }
 function useQ(q,p){if(q.c==='fam'){const f=LS.get('tef_fam',[]);const it=f.find(x=>x.id===q.id);if(it){it.n=(it.n||0)+1;LS.set('tef_fam',f)}return}
@@ -740,7 +748,8 @@ function message({title,body='',color,card,buttons=[],actor}){
 function showQuestion(q,o){
   const cat=q.c==='fam'?FAMCAT:CATS[q.c],p=o.player,order=shuffle([0,1,2,3]),L='ABCD';
   let secondUsed=false,done=false;
-  openSheet(`<div class="qhead"><div><div class="qmeta" style="text-align:left">${esc(o.tag||'Pergunta')}</div><div class="qcat">${cat.n}</div></div><div class="qmeta">${esc(p.name)}<br>${'●'.repeat(q.d)}${'○'.repeat(3-q.d)}</div></div>
+  const per=q.data?periodo(q.data):null;
+  openSheet(`<div class="qhead"><div><div class="qmeta" style="text-align:left">${esc(o.tag||'Pergunta')}${per?' · '+per:''}</div><div class="qcat">${cat.n}</div></div><div class="qmeta">${esc(p.name)}<br>${'●'.repeat(q.d)}${'○'.repeat(3-q.d)}</div></div>
    ${o.timer?'<div class="tbar"><i id="tfill"></i></div><div class="tnum" id="tnum"></div>':''}
    <h2 class="qtext">${esc(q.q)}</h2>
    <div class="opts">${order.map((k,j)=>`<button class="opt" data-k="${k}"><b>${L[j]}</b><span>${esc(q.a[k])}</span></button>`).join('')}</div>
@@ -776,7 +785,8 @@ function showQuestion(q,o){
     const base=ok?'Certo!':k===-1?'Acabou o tempo.':'Errado.';
     const v=`<p class="verdict ${ok?'ok':'no'}">${base}</p>${o.othersHtml||''}`;
     if(o.quick){$('#qfoot').innerHTML=v;setTimeout(()=>{closeSheet();o.onAnswer(ok)},1300);return}
-    $('#qfoot').innerHTML=`${v}${q.e?`<p class="expl">${esc(q.e)}</p>`:''}<div class="sbtns" style="padding:0"><button class="btn primary" id="qcont">Continuar</button></div>`;
+    const src=q.fonte?`<p class="expl" style="font-size:.85rem;margin-top:-8px">Fonte: ${q.url?`<a href="${esc(q.url)}" target="_blank" rel="noopener">${esc(q.fonte)}</a>`:esc(q.fonte)}${q.data?', '+esc(dataPT(q.data)):''}</p>`:'';
+    $('#qfoot').innerHTML=`${v}${q.e?`<p class="expl">${esc(q.e)}</p>`:''}${src}<div class="sbtns" style="padding:0"><button class="btn primary" id="qcont">Continuar</button></div>`;
     $('#qcont').focus({preventScroll:true});$('#qcont').onclick=()=>{closeSheet();o.onAnswer(ok)}};
   btns.forEach(b=>b.onclick=()=>{if(o.all&&!finished){const who=CLICKER||(NET.mode==='phones'?NET.pid:p.pid);pick(who,+b.dataset.k);return}answer(+b.dataset.k)});
   if(o.timer)runTimer(o.timer,()=>o.all&&!finished?finishAll():answer(-1));
@@ -920,7 +930,7 @@ function confetti(n){if(matchMedia('(prefers-reduced-motion: reduce)').matches)r
 function renderHome(){
   $('#btnResume').hidden=!LS.get('tef_save',null);
   HIST=LS.get('tef_hist',{});const used=Object.keys(HIST).filter(id=>QBANK.some(q=>q.id===id)).length;const fam=LS.get('tef_fam',[]).length;
-  $('#homeStats').textContent=`${QBANK.length} perguntas no banco · ${QBANK.length-used} ainda por sair · ${fam} perguntas da família`;
+  $('#homeStats').textContent=`${QBANK.length} perguntas no banco · ${QBANK.length-used} ainda por sair · ${fam} perguntas da família`+(NEWS_INFO&&NEWS_INFO.atualizado?` · Atualidades de ${dataPT(NEWS_INFO.atualizado)}`:'');
 }
 $('#catChips').innerHTML=CATS.map(c=>`<span class="chip" style="--cc:${c.c}"><i></i>${c.n}</span>`).join('');
 $('#btnNew').onclick=()=>{show('setup');renderSetup()};
@@ -1192,6 +1202,7 @@ buildBoard($('#previewBoard'),false);
 (()=>{const w=document.querySelectorAll('#previewBoard .wedge');[0,2,3,5].forEach(k=>w[k].setAttribute('fill-opacity','1'))})();
 renderHome();
 netBoot();
+loadNews();
 if('serviceWorker' in navigator){let reloaded=false;const had=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!reloaded&&!(G&&$('#game').classList.contains('on'))){reloaded=true;location.reload()}});addEventListener('load',()=>{navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).catch(()=>{})})}
 </script>
 </body>
