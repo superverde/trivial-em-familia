@@ -27,6 +27,7 @@
   color-scheme:dark;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html,body{height:100%;margin:0}
 body{background:radial-gradient(1100px 760px at 50% 28%, var(--felt2) 0%, var(--felt) 62%) fixed, var(--felt);color:var(--ink);font-family:var(--fb);font-size:16px;line-height:1.45;-webkit-tap-highlight-color:transparent}
 h1,h2,h3{font-family:var(--fd);line-height:1.1;margin:0;text-wrap:balance}
@@ -188,6 +189,35 @@ label.lbl{display:block;font-weight:800;margin-bottom:6px}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#fbf8f0;color:#152a32;font-weight:800;padding:12px 18px;border-radius:14px;z-index:30;box-shadow:0 8px 24px rgba(0,0,0,.35);max-width:calc(100% - 32px);text-align:center}
 .toast[hidden]{display:none}
 #confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:40}
+/* SALA EM REDE */
+.lobbygrid{display:grid;gap:16px;grid-template-columns:1fr}
+@media(min-width:860px){.lobbygrid{grid-template-columns:minmax(300px,420px) 1fr;align-items:start}}
+.qrbox{display:grid;gap:10px;justify-items:center;text-align:center}
+#qr{background:#fff;border-radius:18px;padding:14px;width:min(100%,340px);aspect-ratio:1}
+#qr svg{width:100%;height:100%;display:block}
+.code{font-family:var(--fd);font-size:1.4rem}
+.code b{font-size:2.2rem;letter-spacing:.18em;color:var(--gold)}
+.lrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.lrow:last-child{border-bottom:0}
+.lrow .dot{width:34px;height:34px;font-size:.9rem;border-width:2px}
+.lrow .grow{flex:1}
+.lrow small{color:var(--muted)}
+.off{opacity:.5}
+.swatches{display:flex;flex-wrap:wrap;gap:8px}
+.swatches button{width:44px;height:44px;border-radius:50%;border:3px solid #0b2530;cursor:pointer}
+.swatches button[aria-pressed=true]{border-color:#fff;box-shadow:0 0 0 3px var(--gold)}
+.swatches button:disabled{opacity:.2;cursor:not-allowed}
+.roomtag{font-family:var(--fb);font-size:.8rem;font-weight:800;color:var(--muted);margin-left:6px;letter-spacing:.06em}
+.locked button,.locked .opt{pointer-events:none}
+.locked .opt,.locked .btn,.locked .destbtn{opacity:.6}
+.waitnote{background:#10232a;color:#fbf8f0;font-weight:800;text-align:center;padding:8px 12px;font-size:.95rem}
+.waitnote.me{background:#1f9d62}
+body.client .die-scene,body.client #btnRules2,body.client #btnSound{display:none}
+body.client.noboard .boardbox{display:none}
+body.client.noboard .gamewrap{grid-template-columns:minmax(0,1fr);max-width:560px}
+body.client .gamewrap{grid-template-columns:minmax(0,1fr)}
+@media(min-width:960px){body.client:not(.noboard) .gamewrap{grid-template-columns:minmax(0,1fr) 370px}}
+.myturn{background:var(--gold);color:#2a2100;font-family:var(--fd);font-weight:800;font-size:1.2rem;text-align:center;border-radius:14px;padding:10px;animation:pulse 1.2s ease-in-out infinite}
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
 }
@@ -203,7 +233,9 @@ label.lbl{display:block;font-weight:800;margin-bottom:6px}
       <h1 class="logo" style="margin-top:10px">Trivial<em>em Família</em></h1>
       <p class="tagline">Quem sabe mais?</p>
       <div class="homebtns">
-        <button class="btn primary" id="btnNew">Nova partida</button>
+        <button class="btn primary" id="btnNew">Jogar num telemóvel</button>
+        <button class="btn primary" id="btnRoom">Criar sala com QR code</button>
+        <button class="btn" id="btnJoin">Entrar numa sala</button>
         <button class="btn" id="btnResume" hidden>Continuar partida</button>
         <button class="btn" id="btnFamily">A Nossa Família</button>
         <button class="btn ghost" id="btnRules">Como jogar</button>
@@ -244,7 +276,7 @@ label.lbl{display:block;font-weight:800;margin-bottom:6px}
 <!-- JOGO -->
 <main id="game" class="screen">
   <div class="gametop">
-    <div class="brand">Trivial <span>em Família</span></div>
+    <div class="brand">Trivial <span>em Família</span> <small id="roomTag" class="roomtag" hidden></small></div>
     <div style="display:flex;gap:8px">
       <button class="btn ghost small" id="btnSound" aria-pressed="true">Som: engraçado</button>
       <button class="btn ghost small" id="btnRules2">Regras</button>
@@ -292,11 +324,64 @@ label.lbl{display:block;font-weight:800;margin-bottom:6px}
   </div>
 </main>
 
+<!-- SALA (anfitrião) -->
+<main id="lobby" class="screen">
+  <div class="topbar"><h1>Sala de jogo</h1><button class="btn ghost small" id="lobbyBack">Cancelar</button></div>
+  <div class="wrap lobbygrid" style="padding-top:0">
+    <section class="panel qrbox">
+      <div class="eyebrow">Apontem a câmara do telemóvel</div>
+      <div id="qr" aria-label="Código QR para entrar na sala"></div>
+      <div class="code">Código <b id="roomCode">·····</b></div>
+      <p class="stats" id="roomUrl"></p>
+      <p class="stats" id="lobbyStatus">A criar a sala…</p>
+    </section>
+    <section class="panel stack">
+      <div><label class="lbl">Como vão jogar?</label><div class="seg" id="optMode"></div><p class="stats" id="modeHelp" style="margin:6px 0 0"></p></div>
+      <div id="meBox" class="stack" hidden>
+        <label class="lbl" for="meName">O seu nome (também joga)</label>
+        <div class="prow" style="border:0;padding:0"><button class="pcolor" id="meColor" aria-label="Mudar cor">?</button><input type="text" id="meName" maxlength="16" placeholder="Nome"><select id="meLevel" aria-label="Nível"></select></div>
+      </div>
+      <div><label class="lbl">Jogadores na sala (<span id="lobbyCount">0</span>/8)</label><div id="lobbyList"></div></div>
+      <div class="opts-grid" style="margin-top:0">
+        <div><label class="lbl">Peças para vencer</label><div class="seg" id="lNeed"></div></div>
+        <div><label class="lbl">Tempo por pergunta</label><div class="seg" id="lTimer"></div></div>
+      </div>
+      <button class="btn primary" id="lobbyStart" style="font-size:1.1rem;padding:14px" disabled>Começar a partida</button>
+    </section>
+  </div>
+</main>
+
+<!-- ENTRAR NA SALA (telemóvel) -->
+<main id="join" class="screen">
+  <div class="topbar"><h1>Entrar na sala</h1><button class="btn ghost small" id="joinBack">Voltar</button></div>
+  <div class="wrap stack" style="padding-top:0;max-width:560px">
+    <section class="panel stack" id="joinCodeBox">
+      <label class="lbl" for="jcode">Código da sala (aparece na TV ou no telemóvel de quem criou)</label>
+      <input type="text" id="jcode" maxlength="5" autocapitalize="characters" autocomplete="off" style="font-size:1.6rem;letter-spacing:.3em;text-transform:uppercase;text-align:center">
+      <button class="btn primary" id="jcodeGo">Ligar à sala</button>
+    </section>
+    <section class="panel stack" id="joinForm" hidden>
+      <div><label class="lbl" for="jname">O seu nome</label><input type="text" id="jname" maxlength="16" placeholder="Ex.: Avó Lurdes"></div>
+      <div><label class="lbl" for="jlevel">Nível</label><select id="jlevel"></select></div>
+      <div><label class="lbl">Cor do peão</label><div class="swatches" id="jcolors"></div></div>
+      <button class="btn primary" id="jgo" style="font-size:1.1rem;padding:14px">Entrar no jogo</button>
+    </section>
+    <p class="stats" id="joinStatus" aria-live="polite"></p>
+    <section class="panel" id="joinLobby" hidden>
+      <h2 style="font-size:1.2rem">Na sala</h2>
+      <div id="joinList"></div>
+      <p class="stats" id="joinWait" style="margin-bottom:0"></p>
+    </section>
+  </div>
+</main>
+
 <div id="sheet" class="sheet" hidden><div class="scard" id="scard" role="dialog" aria-modal="true"></div></div>
 <div id="toast" class="toast" hidden></div>
 <canvas id="confetti"></canvas>
 
 <script src="perguntas.js"></script>
+<script src="lib/peerjs.min.js"></script>
+<script src="lib/qrcode.js"></script>
 <script>
 /* ================= DADOS ================= */
 const CATS=[
@@ -635,18 +720,18 @@ function useQ(q,p){if(q.c==='fam'){const f=LS.get('tef_fam',[]);const it=f.find(
 
 /* ================= FOLHA (perguntas e mensagens) ================= */
 let qTimer=null;
-function openSheet(html,color){const c=$('#scard');c.style.setProperty('--cc',color||'#1d6f86');c.innerHTML=html;$('#sheet').hidden=false;c.scrollTop=0;const f=c.querySelector('button:not(:disabled)');if(f)f.focus({preventScroll:true})}
+function openSheet(html,color,actor='host'){const c=$('#scard');c.dataset.actor=actor;c.style.setProperty('--cc',color||'#1d6f86');c.innerHTML=html;$('#sheet').hidden=false;c.scrollTop=0;const f=c.querySelector('button:not(:disabled)');if(f)f.focus({preventScroll:true})}
 function closeSheet(){stopTimer();$('#sheet').hidden=true}
 function stopTimer(){if(qTimer)cancelAnimationFrame(qTimer);qTimer=null}
 function runTimer(sec,onEnd){stopTimer();const fill=$('#tfill'),num=$('#tnum');if(!fill)return;const t0=performance.now();let lastS=null;
   const tick=()=>{const left=sec-(performance.now()-t0)/1000;const cs=Math.ceil(left);if(left<5&&left>0&&cs!==lastS){lastS=cs;sfx.tick()}fill.style.width=Math.max(0,left/sec*100)+'%';fill.classList.toggle('low',left<5);if(num)num.textContent=Math.max(0,Math.ceil(left))+' s';
     if(left<=0){qTimer=null;onEnd();return}qTimer=requestAnimationFrame(tick)};qTimer=requestAnimationFrame(tick)}
-function message({title,body='',color,card,buttons=[]}){
+function message({title,body='',color,card,buttons=[],actor}){
   let h=`<div class="mband"></div><h2 class="mtitle">${title}</h2>`;
   if(card)h+=`<div class="playcard"><div class="k">Carta surpresa</div><h3>${card.t}</h3><div>${card.d}</div></div>`;
   if(body)h+=`<div class="sbody">${body}</div>`;
   h+=`<div class="sbtns">${buttons.map((b,i)=>`<button class="btn ${b.cls||''}" data-b="${i}" ${b.color?`style="--cc:${b.color}"`:''}>${esc(b.label)}</button>`).join('')}</div>`;
-  openSheet(h,color);
+  openSheet(h,color,actor!==undefined?String(actor):(G&&!G.over&&$('#game').classList.contains('on')?String(G.turn):'host'));
   document.querySelectorAll('#scard [data-b]').forEach(el=>el.onclick=()=>{const b=buttons[+el.dataset.b];if(!b.keep)closeSheet();b.fn&&b.fn()});
 }
 function showQuestion(q,o){
@@ -656,11 +741,11 @@ function showQuestion(q,o){
    ${o.timer?'<div class="tbar"><i id="tfill"></i></div><div class="tnum" id="tnum"></div>':''}
    <h2 class="qtext">${esc(q.q)}</h2>
    <div class="opts">${order.map((k,j)=>`<button class="opt" data-k="${k}"><b>${L[j]}</b><span>${esc(q.a[k])}</span></button>`).join('')}</div>
-   <div id="qfoot"></div>`,cat.c);
+   <div id="qfoot"></div>`,cat.c,String(G.players.indexOf(p)));
   useQ(q,p);
   const btns=[...document.querySelectorAll('#scard .opt')];
   const answer=k=>{if(done)return;stopTimer();const ok=k===0;
-    if(o.hidden){done=true;btns.forEach(b=>{b.disabled=true;if(+b.dataset.k===k)b.classList.add('picked')});beep(500,.06);setTimeout(()=>{closeSheet();o.onAnswer(ok)},450);return}
+    if(o.hidden){done=true;btns.forEach(b=>{b.disabled=true;if(+b.dataset.k===k&&!NET.on)b.classList.add('picked')});beep(500,.06);setTimeout(()=>{closeSheet();o.onAnswer(ok)},450);return}
     if(!ok&&o.allowSecond&&p.cards.seg>0&&!secondUsed){
       const chosen=btns.find(b=>+b.dataset.k===k);if(chosen){chosen.disabled=true;chosen.classList.add('wrong')}sfx.react(false,{quick:true,timeout:k===-1});
       $('#qfoot').innerHTML=`<p class="verdict no">${k===-1?'Acabou o tempo.':'Resposta errada.'}</p><p class="expl">Tem a carta Segunda oportunidade. Quer tentar outra vez?</p><div class="sbtns" style="padding:0"><button class="btn primary" id="useSec">Usar segunda oportunidade</button><button class="btn" id="noSec">Não usar</button></div>`;
@@ -746,12 +831,12 @@ function afterAnswer(ok,q,c,ctx){
 /* ===== Pergunta final ===== */
 function finalQuestion(){const p=curP();
   message({title:'Pergunta final',color:'#fbf8f0',body:`<p>${esc(p.name)} está no centro. <strong>Os adversários escolhem a categoria</strong>. A pergunta é difícil: se acertar, ganha a partida.</p>`,
-    buttons:CATS.map((c,i)=>({label:c.n,cls:'catb',color:c.c,fn:()=>ask(i,{final:true,diff:3})}))})}
+    actor:'others',buttons:CATS.map((c,i)=>({label:c.n,cls:'catb',color:c.c,fn:()=>ask(i,{final:true,diff:3})}))})}
 function victory(p){G.over=true;LS.del('tef_save');renderAll();confetti(260);sfx.champ();
   const rank=G.players.map((x,i)=>({...x,i})).sort((a,b)=>b.pieces.length-a.pieces.length||b.points-a.points);
   rank.sort((a,b)=>(b.name===p.name)-(a.name===p.name));
   message({title:`${esc(p.name)} venceu!`,color:p.color,body:`<p>Acertou na pergunta final. Quem sabe mais? Hoje, foi ${esc(p.name)}.</p><table class="rank"><thead><tr><th>Jogador</th><th>Peças</th><th>Certas</th><th>Pontos</th></tr></thead><tbody>${rank.map(r=>`<tr><td><strong>${esc(r.name)}</strong></td><td>${r.pieces.length}</td><td>${r.correct}/${r.answered}</td><td>${r.points}</td></tr>`).join('')}</tbody></table>`,
-    buttons:[{label:'Nova partida',cls:'primary',fn:()=>{show('setup');renderSetup()}},{label:'Menu',fn:()=>show('home')}]})}
+    actor:'host',buttons:NET.on?[{label:'Voltar ao menu',cls:'primary',fn:()=>{netEnd();show('home')}}]:[{label:'Nova partida',cls:'primary',fn:()=>{show('setup');renderSetup()}},{label:'Menu',fn:()=>show('home')}]})}
 
 /* ===== Cartas surpresa ===== */
 const CARDS=[
@@ -796,6 +881,7 @@ function startDuel(){const p=curP(),opp=G.players.filter((o,i)=>i!==G.turn);sfx.
   message({title:'Duelo!',color:'#e9e4d6',body:'<p>Escolha um adversário. Os dois respondem à mesma pergunta, à vez, sem ver a resposta do outro.</p><p>Se só um acertar, ganha 20 pontos. Se ambos acertarem, cada um ganha 10.</p>',buttons:opp.map(o=>({label:o.name,cls:'catb',color:o.color,fn:()=>duel(o)}))})}
 function duel(o){const p=curP(),c=Math.floor(Math.random()*7),q=pickQ(c,p,2);
   showQuestion(q,{player:p,timer:G.timer,hidden:true,tag:'Duelo · responda em segredo',onAnswer:okA=>{
+    if(NET.on)return showQuestion(q,{player:o,timer:G.timer,tag:'Duelo',onAnswer:okB=>duelEnd(p,o,okA,okB)});
     message({title:`Passe o telemóvel a ${esc(o.name)}`,color:o.color,body:'<p>Sem espreitar a resposta anterior.</p>',buttons:[{label:'Estou pronto',cls:'primary',fn:()=>{
       showQuestion(q,{player:o,timer:G.timer,tag:'Duelo',onAnswer:okB=>duelEnd(p,o,okA,okB)})}}]})}})}
 function duelEnd(p,o,a,b){p.answered++;o.answered++;if(a)p.correct++;if(b)o.correct++;let t,next;
@@ -829,12 +915,12 @@ const RULES=`<div class="mband"></div><h2 class="mtitle">Como jogar</h2><div cla
 <div class="sbtns"><button class="btn primary" id="closeRules">Fechar</button></div>`;
 const openRules=()=>{openSheet(RULES);$('#closeRules').onclick=closeSheet};
 $('#btnRules').onclick=openRules;$('#btnRules2').onclick=openRules;
-$('#btnClearHist').onclick=()=>message({title:'Limpar histórico?',body:'<p>O jogo volta a considerar todas as perguntas como novas.</p>',buttons:[{label:'Limpar',cls:'primary',fn:()=>{LS.del('tef_hist');LS.del('tef_pseen');HIST={};PSEEN={};renderHome();toast('Histórico limpo.')}},{label:'Cancelar'}]});
+$('#btnClearHist').onclick=()=>message({actor:'host',title:'Limpar histórico?',body:'<p>O jogo volta a considerar todas as perguntas como novas.</p>',buttons:[{label:'Limpar',cls:'primary',fn:()=>{LS.del('tef_hist');LS.del('tef_pseen');HIST={};PSEEN={};renderHome();toast('Histórico limpo.')}},{label:'Cancelar'}]});
 
 /* ================= CONFIGURAÇÃO ================= */
 let SET={players:[{name:'Jogador 1',color:PCOLORS[0],level:'adu'},{name:'Jogador 2',color:PCOLORS[1],level:'adu'},{name:'Jogador 3',color:PCOLORS[2],level:'jov'}],need:7,timer:30};
 const lastSet=LS.get('tef_setup',null);if(lastSet)SET=lastSet;
-function seg(el,opts,val,onPick){el.innerHTML=opts.map(o=>`<button type="button" aria-pressed="${o.v===val}" data-v="${o.v}">${o.l}</button>`).join('');el.querySelectorAll('button').forEach(b=>b.onclick=()=>{onPick(JSON.parse(b.dataset.v));renderSetup()})}
+function seg(el,opts,val,onPick,rerender){el.innerHTML=opts.map(o=>`<button type="button" aria-pressed="${o.v===val}" data-v='${JSON.stringify(o.v)}'>${o.l}</button>`).join('');el.querySelectorAll('button').forEach(b=>b.onclick=()=>{onPick(JSON.parse(b.dataset.v));(rerender||renderSetup)()})}
 function renderSetup(){
   $('#playerRows').innerHTML=SET.players.map((p,i)=>`<div class="prow"><button class="pcolor" data-i="${i}" style="background:${p.color}" aria-label="Mudar cor de ${esc(p.name)}">${esc(makeLabels(SET.players)[i])}</button><input type="text" id="pn${i}" value="${esc(p.name)}" maxlength="16" aria-label="Nome do jogador ${i+1}"><select id="pl${i}" aria-label="Nível">${Object.entries(LEVELS).map(([k,l])=>`<option value="${k}" ${p.level===k?'selected':''}>${l.n}</option>`).join('')}</select><button class="iconbtn" data-del="${i}" aria-label="Remover" ${SET.players.length<=2?'disabled':''}>×</button></div>`).join('');
   SET.players.forEach((p,i)=>{$('#pn'+i).oninput=e=>{p.name=e.target.value;const L=makeLabels(SET.players);document.querySelectorAll('.pcolor').forEach((b,j)=>b.textContent=L[j])};$('#pl'+i).onchange=e=>p.level=e.target.value});
@@ -862,7 +948,7 @@ function enterGame(){show('game');buildBoard($('#board'),true);buildDie();
   updSoundBtn();startTurn();}
 function updSoundBtn(){const b=$('#btnSound');b.textContent=SNDL[sndMode];b.setAttribute('aria-pressed',sndMode!=='off')}
 $('#btnSound').onclick=()=>{sndMode={fun:'simple',simple:'off',off:'fun'}[sndMode];LS.set('tef_sndmode',sndMode);updSoundBtn();if(sndMode==='fun')sfx.react(true,{quick:true})};
-$('#btnExit').onclick=()=>{save();show('home');toast('Partida guardada. Pode continuar mais tarde.')};
+$('#btnExit').onclick=()=>{if(NET.role==='client'){netLeave();return}save();if(NET.on)netEnd();show('home');toast('Partida guardada. Pode continuar mais tarde.')};
 
 /* ================= A NOSSA FAMÍLIA ================= */
 function renderFamily(){const f=LS.get('tef_fam',[]);$('#famCount').textContent=`(${f.length})`;
@@ -871,10 +957,215 @@ function renderFamily(){const f=LS.get('tef_fam',[]);$('#famCount').textContent=
 $('#famForm').onsubmit=e=>{e.preventDefault();const f=LS.get('tef_fam',[]);
   f.push({id:'fam'+Date.now(),q:$('#fq').value.trim(),a:[0,1,2,3].map(i=>$('#fa'+i).value.trim()),e:$('#fe').value.trim(),n:0});LS.set('tef_fam',f);e.target.reset();renderFamily();toast('Pergunta guardada.')};
 
+/* ================= JOGO EM REDE (QR code) =================
+   O anfitrião (TV, computador ou telemóvel) corre o jogo todo.
+   Os telemóveis espelham o ecrã e só enviam toques nos botões. */
+const NET={on:false,role:null,mode:'tv',code:null,peer:null,conn:null,conns:{},lobby:[],started:false,last:'',hostIdx:-1,joined:false,me:null,taken:[],retry:null};
+NET.pid=LS.get('tef_pid',null)||(()=>{const p='p'+Math.random().toString(36).slice(2,10);LS.set('tef_pid',p);return p})();
+const ALPH='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const newCode=()=>Array.from({length:5},()=>ALPH[Math.floor(Math.random()*ALPH.length)]).join('');
+const joinURL=c=>location.origin+location.pathname.replace(/index\.html$/,'')+'?sala='+c;
+const ICE={config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]}};
+(()=>{const srv=LS.get('tef_peersrv',null);if(srv)Object.assign(ICE,srv)})();
+const hasPeer=()=>typeof Peer!=='undefined';
+let LOB=LS.get('tef_lobby',{mode:'tv',need:7,timer:30,me:{name:'',level:'adu',color:PCOLORS[0]}});
+const saveLob=()=>LS.set('tef_lobby',LOB);
+
+/* ---------- anfitrião ---------- */
+function openLobby(){
+  if(!hasPeer()){toast('Sem ligação à internet: não é possível criar a sala.');return}
+  show('lobby');if(!NET.peer||NET.role!=='host'||NET.peer.destroyed)hostStart();renderLobby();
+}
+function hostStart(){
+  netReset();NET.role='host';NET.on=true;NET.mode=LOB.mode;
+  const tryCode=()=>{NET.code=newCode();const peer=new Peer('tef-'+NET.code,ICE);NET.peer=peer;
+    peer.on('open',()=>{renderLobby()});
+    peer.on('error',e=>{if(e.type==='unavailable-id'){try{peer.destroy()}catch(_){}tryCode();return}
+      if(e.type==='peer-unavailable')return;$('#lobbyStatus').textContent='Problema de ligação ('+e.type+'). Verifique a internet e tente de novo.'});
+    peer.on('disconnected',()=>{try{peer.reconnect()}catch(_){}});
+    peer.on('connection',conn=>{conn.on('data',d=>hostData(conn,d));conn.on('close',()=>{for(const k in NET.conns)if(NET.conns[k]===conn)delete NET.conns[k];renderLobby();sendLobby()})});
+  };tryCode();
+}
+function lobbyAll(){const me={pid:NET.pid,name:(LOB.me.name||'').trim()||'Anfitrião',level:LOB.me.level,color:LOB.me.color,host:true};return LOB.mode==='phones'?[me,...NET.lobby]:NET.lobby.slice()}
+function uniqName(name,pid){let n=name,i=2;const others=lobbyAll().filter(p=>p.pid!==pid).map(p=>p.name.toLowerCase());while(others.includes(n.toLowerCase()))n=name+' '+(i++);return n}
+function freeColor(want,pid){const taken=lobbyAll().filter(p=>p.pid!==pid).map(p=>p.color);if(want&&PCOLORS.includes(want)&&!taken.includes(want))return want;return PCOLORS.find(c=>!taken.includes(c))||PCOLORS[0]}
+function pidOf(conn){for(const k in NET.conns)if(NET.conns[k]===conn)return k;return null}
+function sendLobby(){const msg={t:'lobby',lobby:lobbyAll().map(p=>({pid:p.pid,name:p.name,color:p.color,level:p.level})),mode:LOB.mode,started:NET.started};for(const k in NET.conns){const c=NET.conns[k];if(c.open)try{c.send(msg)}catch(_){}}}
+function hostData(conn,d){
+  if(!d||typeof d!=='object')return;
+  if(d.t==='peek'){try{conn.send({t:'lobby',lobby:lobbyAll().map(p=>({pid:p.pid,name:p.name,color:p.color,level:p.level})),mode:LOB.mode,started:NET.started})}catch(_){}return}
+  if(d.t==='hello'){const pid=String(d.pid||'').slice(0,24);if(!pid||pid===NET.pid)return;
+    if(NET.started){if(G&&G.players.some(p=>p.pid===pid)){NET.conns[pid]=conn;conn.send({t:'start'});NET.last='';setTimeout(()=>broadcast(true),50)}else conn.send({t:'full',why:'A partida já começou.'});return}
+    let pl=NET.lobby.find(x=>x.pid===pid);
+    if(!pl){if(lobbyAll().length>=8){conn.send({t:'full',why:'A sala já tem 8 jogadores.'});return}pl={pid};NET.lobby.push(pl)}
+    pl.name=uniqName(String(d.name||'').trim().slice(0,16)||'Jogador',pid);pl.level=LEVELS[d.level]?d.level:'adu';pl.color=freeColor(d.color,pid);
+    NET.conns[pid]=conn;conn.send({t:'joined',you:pl});renderLobby();sendLobby();beep(880,.08);return}
+  if(d.t==='bye'){const pid=pidOf(conn);if(!NET.started&&pid){NET.lobby=NET.lobby.filter(x=>x.pid!==pid);renderLobby();sendLobby()}return}
+  if(d.t==='click'){const pid=pidOf(conn);if(pid)hostClick(String(d.rid||''),pid)}
+}
+function renderLobby(){
+  if(!$('#lobby').classList.contains('on'))return;
+  const ready=NET.peer&&NET.peer.open;
+  $('#roomCode').textContent=ready?NET.code:'·····';
+  if(ready&&typeof qrcode!=='undefined'){const url=joinURL(NET.code);if($('#qr').dataset.url!==url){const q=qrcode(0,'M');q.addData(url);q.make();$('#qr').innerHTML=q.createSvgTag({cellSize:8,margin:1,scalable:true});$('#qr').dataset.url=url}$('#roomUrl').textContent=url}
+  $('#lobbyStatus').textContent=ready?'Sala aberta. Cada jogador aponta a câmara ao QR code e escreve o nome.':'A criar a sala…';
+  seg($('#optMode'),[{v:'tv',l:'TV + telemóveis'},{v:'phones',l:'Só telemóveis'}],LOB.mode,v=>{LOB.mode=v;NET.mode=v;saveLob();sendLobby()},renderLobby);
+  $('#modeHelp').textContent=LOB.mode==='tv'?'Este ecrã (TV, computador ou tablet) mostra o tabuleiro. Cada telemóvel serve de comando para lançar o dado e responder.':'Todos veem o tabuleiro no seu telemóvel. Quem criou a sala também joga, neste telemóvel.';
+  $('#meBox').hidden=LOB.mode!=='phones';
+  if(LOB.mode==='phones'){if(document.activeElement!==$('#meName'))$('#meName').value=LOB.me.name;$('#meLevel').innerHTML=Object.entries(LEVELS).map(([k,l])=>`<option value="${k}" ${LOB.me.level===k?'selected':''}>${l.n}</option>`).join('');$('#meColor').style.background=LOB.me.color;$('#meColor').textContent=((LOB.me.name||'?').trim()[0]||'?').toUpperCase()}
+  const all=lobbyAll();$('#lobbyCount').textContent=all.length;
+  $('#lobbyList').innerHTML=all.length?all.map(p=>{const on=p.host||(NET.conns[p.pid]&&NET.conns[p.pid].open);return`<div class="lrow ${on?'':'off'}"><span class="dot" style="--pc:${p.color}">${esc((p.name[0]||'?').toUpperCase())}</span><div class="grow"><strong>${esc(p.name)}</strong><br><small>${LEVELS[p.level].n}${p.host?' · este aparelho':on?'':' · desligado'}</small></div>${p.host?'':`<button class="iconbtn" data-kick="${esc(p.pid)}" aria-label="Retirar ${esc(p.name)}">×</button>`}</div>`}).join(''):'<p class="stats">Ainda ninguém entrou. Apontem a câmara ao QR code.</p>';
+  document.querySelectorAll('[data-kick]').forEach(b=>b.onclick=()=>{const pid=b.dataset.kick;const c=NET.conns[pid];if(c)try{c.send({t:'kicked'})}catch(_){}NET.lobby=NET.lobby.filter(x=>x.pid!==pid);delete NET.conns[pid];renderLobby();sendLobby()});
+  seg($('#lNeed'),[{v:7,l:'7 · completa'},{v:4,l:'4 · rápida'}],LOB.need,v=>{LOB.need=v;saveLob()},renderLobby);
+  seg($('#lTimer'),[{v:0,l:'Sem tempo'},{v:20,l:'20 s'},{v:30,l:'30 s'},{v:45,l:'45 s'}],LOB.timer,v=>{LOB.timer=v;saveLob()},renderLobby);
+  $('#lobbyStart').disabled=!(ready&&all.length>=2);
+  $('#lobbyStart').textContent=all.length>=2?`Começar a partida (${all.length} jogadores)`:'São precisos pelo menos 2 jogadores';
+}
+$('#meName').oninput=e=>{LOB.me.name=e.target.value;saveLob();$('#meColor').textContent=((LOB.me.name||'?').trim()[0]||'?').toUpperCase();renderLobbyListOnly()};
+$('#meLevel').onchange=e=>{LOB.me.level=e.target.value;saveLob();sendLobby()};
+$('#meColor').onclick=()=>{LOB.me.color=nextFree(LOB.me.color,NET.pid);saveLob();renderLobby();sendLobby()};
+function renderLobbyListOnly(){clearTimeout(renderLobbyListOnly.t);renderLobbyListOnly.t=setTimeout(()=>{renderLobby();sendLobby()},400)}
+function nextFree(cur,pid){const taken=lobbyAll().filter(p=>p.pid!==pid).map(p=>p.color);let j=PCOLORS.indexOf(cur);for(let t=0;t<8;t++){j=(j+1)%8;if(!taken.includes(PCOLORS[j]))return PCOLORS[j]}return cur}
+$('#lobbyBack').onclick=()=>{netEnd();show('home')};
+$('#lobbyStart').onclick=()=>{
+  const all=lobbyAll();if(all.length<2)return;
+  if(LOB.mode==='phones'&&!(LOB.me.name||'').trim()){toast('Escreva o seu nome antes de começar.');$('#meName').focus();return}
+  NET.started=true;NET.mode=LOB.mode;
+  G={players:all.map(p=>({pid:p.pid,name:p.name,color:p.color,level:p.level,pos:0,pieces:[],points:0,cards:{seg:0,dob:0,esc:0},correct:0,answered:0})),turn:Math.floor(Math.random()*all.length),need:LOB.need,timer:LOB.timer,used:[],over:false,net:true};
+  NET.hostIdx=G.players.findIndex(p=>p.pid===NET.pid);
+  for(const k in NET.conns){const c=NET.conns[k];if(c.open)try{c.send({t:'start'})}catch(_){}}
+  document.body.classList.toggle('tvhost',LOB.mode==='tv');
+  enterGame();$('#roomTag').hidden=false;$('#roomTag').textContent='Sala '+NET.code;
+  startObserver();NET.last='';broadcast(true);
+  toast(`Começa ${G.players[G.turn].name}, sorteado ao acaso.`);
+};
+let ridN=0,bTimer=null,OBS=null;
+function startObserver(){if(OBS)OBS.disconnect();OBS=new MutationObserver(scheduleBroadcast);
+  ['#scard','#act','#msg','#players','#pawns'].forEach(sel=>{const el=$(sel);if(el)OBS.observe(el,{childList:true,subtree:true,attributes:true,characterData:true})});
+  OBS.observe($('#sheet'),{attributes:true});}
+function scheduleBroadcast(){if(!(NET.on&&NET.role==='host'&&NET.started))return;if(bTimer)return;bTimer=setTimeout(()=>{bTimer=null;broadcast()},200)}
+function actorNow(){if(!$('#sheet').hidden)return $('#scard').dataset.actor||'host';return G&&['roll','choose'].includes(G.phase)?String(G.turn):'none'}
+function canAct(actor,idx){if(idx<0)return false;if(actor==='any')return true;if(actor==='others')return idx!==G.turn;return actor===String(idx)}
+function connOpen(pid){const c=NET.conns[pid];return !!(c&&c.open)}
+function broadcast(force){
+  if(!G)return;
+  document.querySelectorAll('#scard button,#act button').forEach(b=>{if(!b.dataset.rid)b.dataset.rid='r'+(++ridN)});
+  const actor=actorNow(),sheetOn=!$('#sheet').hidden;
+  if(NET.mode==='phones'){const ap=/^\d+$/.test(actor)?G.players[+actor]:null;const away=ap&&ap.pid!==NET.pid&&!connOpen(ap.pid);
+    const othersAway=actor==='others'&&G.players.every((p,i)=>i===G.turn||p.pid===NET.pid||!connOpen(p.pid));
+    const lock=!(actor==='host'||actor==='none'||canAct(actor,NET.hostIdx)||away||othersAway);
+    $('#scard').classList.toggle('locked',lock&&sheetOn);$('#act').classList.toggle('locked',lock&&!sheetOn)}
+  const snap={sheet:sheetOn?$('#scard').innerHTML:null,cc:$('#scard').style.getPropertyValue('--cc'),act:$('#act').innerHTML,msg:$('#msg').innerHTML,actor};
+  const g={players:G.players.map(p=>({pid:p.pid,name:p.name,color:p.color,level:p.level,pos:p.pos,pieces:p.pieces,points:p.points,cards:p.cards,correct:p.correct,answered:p.answered})),turn:G.turn,need:G.need,over:G.over};
+  const s=JSON.stringify([g,snap]);if(!force&&s===NET.last)return;NET.last=s;
+  const msg={t:'st',g,snap,mode:NET.mode,code:NET.code};
+  for(const k in NET.conns){const c=NET.conns[k];if(c.open)try{c.send(msg)}catch(_){}}
+}
+function hostClick(rid,pid){
+  if(!G)return;const idx=G.players.findIndex(p=>p.pid===pid);const actor=actorNow();if(!canAct(actor,idx))return;
+  const area=$('#sheet').hidden?$('#act'):$('#scard');const el=[...area.querySelectorAll('button')].find(b=>b.dataset.rid===rid);
+  if(el&&!el.disabled){const was=area.classList.contains('locked');area.classList.remove('locked');el.click();if(was)area.classList.add('locked')}
+}
+function netEnd(){if(NET.role==='host'){for(const k in NET.conns){const c=NET.conns[k];if(c.open)try{c.send({t:'end'})}catch(_){}}}
+  setTimeout(()=>{try{NET.peer&&NET.peer.destroy()}catch(_){}netReset()},150);if(OBS)OBS.disconnect();document.body.classList.remove('tvhost');$('#roomTag').hidden=true}
+function netReset(){NET.on=false;NET.role=null;NET.peer=null;NET.conn=null;NET.conns={};NET.lobby=[];NET.started=false;NET.last='';NET.hostIdx=-1;NET.joined=false;clearTimeout(NET.retry)}
+
+/* ---------- telemóvel que entra na sala ---------- */
+let JOIN=LS.get('tef_join',{name:'',level:'adu',color:null});
+function openJoin(code){
+  if(!hasPeer()){toast('Sem ligação à internet: não é possível entrar na sala.');return}
+  show('join');$('#joinForm').hidden=true;$('#joinLobby').hidden=true;$('#joinStatus').textContent='';
+  $('#jlevel').innerHTML=Object.entries(LEVELS).map(([k,l])=>`<option value="${k}" ${JOIN.level===k?'selected':''}>${l.n}</option>`).join('');
+  $('#jname').value=JOIN.name||'';
+  if(code){$('#jcode').value=code;connectClient(code)}else{$('#joinCodeBox').hidden=false;$('#jcode').focus()}
+}
+$('#jcodeGo').onclick=()=>{const c=$('#jcode').value.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');if(c.length!==5){$('#joinStatus').textContent='O código tem 5 letras ou números.';return}connectClient(c)};
+$('#jcode').onkeydown=e=>{if(e.key==='Enter')$('#jcodeGo').click()};
+$('#joinBack').onclick=()=>netLeave();
+function connectClient(code){
+  netReset();NET.role='client';NET.code=code;$('#joinStatus').textContent='A ligar à sala '+code+'…';
+  const peer=new Peer(ICE);NET.peer=peer;
+  peer.on('open',()=>openConn());
+  peer.on('error',e=>{if(e.type==='peer-unavailable'){$('#joinStatus').textContent=NET.started?'A sala não responde. A tentar de novo…':'Não encontrei a sala '+code+'. Confirme o código e que o jogo está aberto na TV ou no telemóvel de quem criou.';if(NET.started||NET.joined)retryConn();$('#joinCodeBox').hidden=false;return}
+    $('#joinStatus').textContent='Problema de ligação ('+e.type+'). A tentar de novo…';retryConn()});
+  peer.on('disconnected',()=>{try{peer.reconnect()}catch(_){}});
+}
+function retryConn(){clearTimeout(NET.retry);NET.retry=setTimeout(()=>{if(NET.role!=='client')return;if(!NET.peer||NET.peer.destroyed){const c=NET.code,j=NET.joined,s=NET.started;connectClient(c);NET.joined=j;NET.started=s}else openConn()},2500)}
+function openConn(){
+  const conn=NET.peer.connect('tef-'+NET.code,{reliable:true});NET.conn=conn;
+  conn.on('open',()=>{NET.on=true;$('#joinCodeBox').hidden=true;conn.send({t:'peek'});if(NET.joined)sendHello();toastOnce('Ligado à sala '+NET.code)});
+  conn.on('data',clientData);
+  conn.on('close',()=>{NET.on=false;if(NET.role!=='client')return;const s=$('#joinStatus');if(s)s.textContent='Ligação perdida. A tentar de novo…';if(NET.started)toast('Ligação perdida. A tentar de novo…');retryConn()});
+}
+let lastToast='';function toastOnce(t){if(t!==lastToast){lastToast=t;toast(t)}}
+function sendHello(){if(NET.conn&&NET.conn.open)NET.conn.send({t:'hello',pid:NET.pid,name:JOIN.name,level:JOIN.level,color:JOIN.color})}
+function renderJoinForm(lobby){
+  const others=lobby.filter(p=>p.pid!==NET.pid);NET.taken=others.map(p=>p.color);
+  if(!JOIN.color||NET.taken.includes(JOIN.color))JOIN.color=PCOLORS.find(c=>!NET.taken.includes(c))||PCOLORS[0];
+  $('#jcolors').innerHTML=PCOLORS.map(c=>`<button type="button" style="background:${c}" data-c="${c}" aria-label="Cor" aria-pressed="${c===JOIN.color}" ${NET.taken.includes(c)?'disabled':''}></button>`).join('');
+  document.querySelectorAll('#jcolors button').forEach(b=>b.onclick=()=>{JOIN.color=b.dataset.c;renderJoinForm(lobby)});
+}
+$('#jgo').onclick=()=>{const n=$('#jname').value.trim();if(!n){$('#joinStatus').textContent='Escreva o seu nome.';$('#jname').focus();return}
+  JOIN.name=n;JOIN.level=$('#jlevel').value;LS.set('tef_join',JOIN);NET.joined=true;sendHello();$('#jgo').textContent='Atualizar os meus dados'};
+function clientData(d){
+  if(!d||typeof d!=='object')return;
+  if(d.t==='lobby'){NET.mode=d.mode;if(!NET.started){$('#joinForm').hidden=false;$('#joinLobby').hidden=false;renderJoinForm(d.lobby);
+      $('#joinList').innerHTML=d.lobby.map(p=>`<div class="lrow"><span class="dot" style="--pc:${p.color}">${esc((p.name[0]||'?').toUpperCase())}</span><div class="grow"><strong>${esc(p.name)}</strong>${p.pid===NET.pid?' <small>(você)</small>':''}<br><small>${LEVELS[p.level]?LEVELS[p.level].n:''}</small></div></div>`).join('')||'<p class="stats">Ainda não há jogadores.</p>';
+      $('#joinWait').textContent=NET.joined?'Está dentro! Aguarde que comece a partida.':'Escreva o nome, escolha a cor e carregue em «Entrar no jogo».';
+      $('#joinStatus').textContent=d.mode==='tv'?'O tabuleiro aparece na TV; aqui vai lançar o dado e responder.':'O tabuleiro aparece no seu telemóvel.'}
+    if(d.started&&!NET.joined){$('#joinStatus').textContent='A partida já começou. A tentar voltar a entrar…';$('#joinForm').hidden=true;sendHello()}return}
+  if(d.t==='joined'){NET.joined=true;NET.me=d.you;JOIN.color=d.you.color;LS.set('tef_join',JOIN);$('#joinWait').textContent='Está dentro! Aguarde que comece a partida.';beep(880,.08);return}
+  if(d.t==='full'){$('#joinStatus').textContent=d.why||'Não foi possível entrar.';return}
+  if(d.t==='kicked'){NET.joined=false;$('#joinStatus').textContent='Foi retirado da sala.';return}
+  if(d.t==='start'){NET.started=true;enterClientGame();return}
+  if(d.t==='st'){if(!NET.started){NET.started=true;enterClientGame()}renderClient(d);return}
+  if(d.t==='end'){const was=NET.role==='client';netLeave(true);if(was)toast('Quem criou a sala terminou a partida.');return}
+}
+function enterClientGame(){
+  document.body.classList.add('client');document.body.classList.toggle('noboard',NET.mode==='tv');
+  show('game');buildBoard($('#board'),true);$('#board').onclick=null;$('#roomTag').hidden=false;$('#roomTag').textContent='Sala '+NET.code;
+  $('#btnExit').textContent='Sair';
+}
+function renderClient(d){
+  NET.mode=d.mode;document.body.classList.toggle('noboard',d.mode==='tv');
+  G={...d.g,used:[]};const me=G.players.findIndex(p=>p.pid===NET.pid);
+  const pg=$('#pawns');if(pg&&pg.childElementCount!==G.players.length)pg.innerHTML='';
+  if(d.mode!=='tv'){renderPawns();renderWedges()}
+  renderPlayers();setWho();
+  const s=d.snap,actor=s.actor,mine=canAct(actor,me);
+  $('#act').innerHTML=s.act;$('#msg').innerHTML=s.msg;
+  if(!s.sheet&&actor===String(me)&&me>=0)$('#act').insertAdjacentHTML('afterbegin','<div class="myturn">É a sua vez!</div>');
+  bindClient($('#act'),!s.sheet&&mine);
+  if(s.sheet){const c=$('#scard');c.style.setProperty('--cc',s.cc||'#1d6f86');
+    let note='';const ap=/^\d+$/.test(actor)?G.players[+actor]:null;
+    if(mine)note=`<div class="waitnote me">${actor==='others'?'Escolha a categoria para o adversário':'É a sua vez de responder'}</div>`;
+    else if(ap)note=`<div class="waitnote">É a vez de ${esc(ap.name)}</div>`;
+    else if(actor==='others')note='<div class="waitnote">Os adversários escolhem</div>';
+    c.innerHTML=note+s.sheet;$('#sheet').hidden=false;bindClient(c,mine);
+    if(mine&&!renderClient.wasMine){try{navigator.vibrate&&navigator.vibrate(120)}catch(_){}}
+    renderClient.wasMine=mine;
+  }else{$('#sheet').hidden=true;renderClient.wasMine=false}
+  if(G.over&&!renderClient.overShown){renderClient.overShown=true;confetti(200)}
+}
+function bindClient(root,allowed){root.querySelectorAll('button').forEach(b=>{const rid=b.dataset.rid;if(!allowed||!rid||b.disabled){b.disabled=true;return}
+  b.onclick=()=>{if(NET.conn&&NET.conn.open){NET.conn.send({t:'click',rid});root.querySelectorAll('button').forEach(x=>x.disabled=true);beep(600,.04)}else toast('Sem ligação à sala. A tentar de novo…')}})}
+function netLeave(silent){
+  if(NET.role==='client'&&NET.conn&&NET.conn.open&&!NET.started)try{NET.conn.send({t:'bye'})}catch(_){}
+  try{NET.peer&&NET.peer.destroy()}catch(_){}netReset();
+  document.body.classList.remove('client','noboard');$('#roomTag').hidden=true;$('#btnExit').textContent='Menu';$('#sheet').hidden=true;G=null;
+  if(location.search)history.replaceState(null,'',location.pathname);show('home');
+}
+function netBoot(){
+  $('#btnRoom').onclick=openLobby;$('#btnJoin').onclick=()=>openJoin(null);
+  const code=new URLSearchParams(location.search).get('sala');
+  if(code&&/^[A-Z0-9]{5}$/i.test(code))openJoin(code.toUpperCase());
+}
+
 /* ================= ARRANQUE ================= */
 buildBoard($('#previewBoard'),false);
 (()=>{const w=document.querySelectorAll('#previewBoard .wedge');[0,2,3,5].forEach(k=>w[k].setAttribute('fill-opacity','1'))})();
 renderHome();
+netBoot();
 if('serviceWorker' in navigator){addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})})}
 </script>
 </body>
