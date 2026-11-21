@@ -705,18 +705,20 @@ function spinDie(v){dieTurns+=2;const[x,y]=FACE[v];$('#die').style.transform=`ro
 /* ================= HISTÓRICO / ANTI-REPETIÇÃO ================= */
 let HIST=LS.get('tef_hist',{}), PSEEN=LS.get('tef_pseen',{});
 function rollDiff(level){const w=LEVELS[level].w,r=Math.random();return r<w[0]?1:r<w[0]+w[1]?2:3}
-function pickQ(cat,p,forceDiff){
+function mergeHist(){const h=LS.get('tef_hist',{});for(const k in h)if(!HIST[k]||h[k].t>HIST[k].t)HIST[k]=h[k];const ps=LS.get('tef_pseen',{});for(const n in ps){const a=PSEEN[n]=PSEEN[n]||[];ps[n].forEach(id=>{if(!a.includes(id))a.push(id)})}}
+const recentIds=()=>{mergeHist();const lim=Date.now()-90*864e5;return Object.keys(HIST).filter(id=>HIST[id].t>lim)};
+function pickQ(cat,p,forceDiff){mergeHist();const extra=NET.seenExtra||null;
   let pool=QBANK.filter(q=>q.c===cat&&!G.used.includes(q.id));
   if(!pool.length){G.used=G.used.filter(id=>!id.startsWith(CATS[cat].k));pool=QBANK.filter(q=>q.c===cat)}
   const want=forceDiff||rollDiff(p.level),now=Date.now(),seen=PSEEN[p.name]||[];
   let best=[],bk=1e9;
   for(const q of pool){const h=HIST[q.id];let tier=0;if(h){const days=(now-h.t)/864e5;tier=days<30?3:days<90?2:1}
-    if(seen.includes(q.id))tier=Math.max(tier,2);
+    if(seen.includes(q.id)||(extra&&extra.has(q.id)))tier=Math.max(tier,2);
     const key=tier*3+Math.abs(q.d-want);if(key<bk){bk=key;best=[q]}else if(key===bk)best.push(q)}
   return rnd(best);
 }
 function useQ(q,p){if(q.c==='fam'){const f=LS.get('tef_fam',[]);const it=f.find(x=>x.id===q.id);if(it){it.n=(it.n||0)+1;LS.set('tef_fam',f)}return}
-  if(!G.used.includes(q.id))G.used.push(q.id);const h=HIST[q.id]||{n:0};HIST[q.id]={t:Date.now(),n:h.n+1};LS.set('tef_hist',HIST);
+  if(!G.used.includes(q.id))G.used.push(q.id);mergeHist();const h=HIST[q.id]||{n:0};HIST[q.id]={t:Date.now(),n:h.n+1};LS.set('tef_hist',HIST);
   const s=PSEEN[p.name]=PSEEN[p.name]||[];if(!s.includes(q.id)){s.push(q.id);if(s.length>3000)s.shift()}LS.set('tef_pseen',PSEEN)}
 
 /* ================= FOLHA (perguntas e mensagens) ================= */
@@ -1013,6 +1015,7 @@ function hostData(conn,d){
   if(!d||typeof d!=='object')return;
   if(d.t==='peek'){try{conn.send({t:'lobby',lobby:lobbyAll().map(p=>({pid:p.pid,name:p.name,color:p.color,level:p.level})),mode:LOB.mode,started:NET.started})}catch(_){}return}
   if(d.t==='hello'){const pid=String(d.pid||'').slice(0,24);if(!pid||pid===NET.pid)return;
+    if(Array.isArray(d.seen)){NET.seenExtra=NET.seenExtra||new Set();d.seen.slice(0,2000).forEach(id=>{if(typeof id==='string'&&id.length<20)NET.seenExtra.add(id)})}
     if(NET.started){if(G&&G.players.some(p=>p.pid===pid)){NET.conns[pid]=conn;conn.send({t:'start'});NET.last='';setTimeout(()=>broadcast(true),50)}else conn.send({t:'full',why:'A partida já começou.'});return}
     let pl=NET.lobby.find(x=>x.pid===pid);
     if(!pl){if(lobbyAll().length>=8){conn.send({t:'full',why:'A sala já tem 8 jogadores.'});return}pl={pid};NET.lobby.push(pl)}
@@ -1086,7 +1089,7 @@ function hostClick(rid,pid){
 }
 function netEnd(){if(NET.role==='host'){for(const k in NET.conns){const c=NET.conns[k];if(c.open)try{c.send({t:'end'})}catch(_){}}}
   setTimeout(()=>{try{NET.peer&&NET.peer.destroy()}catch(_){}netReset()},150);if(OBS)OBS.disconnect();document.body.classList.remove('tvhost');$('#roomTag').hidden=true}
-function netReset(){NET.on=false;NET.role=null;NET.peer=null;NET.conn=null;NET.conns={};NET.lobby=[];NET.started=false;NET.last='';NET.hostIdx=-1;NET.joined=false;clearTimeout(NET.retry)}
+function netReset(){NET.seenExtra=null;NET.on=false;NET.role=null;NET.peer=null;NET.conn=null;NET.conns={};NET.lobby=[];NET.started=false;NET.last='';NET.hostIdx=-1;NET.joined=false;clearTimeout(NET.retry)}
 
 /* ---------- telemóvel que entra na sala ---------- */
 let JOIN=LS.get('tef_join',{name:'',level:'adu',color:null});
@@ -1116,7 +1119,7 @@ function openConn(){
   conn.on('close',()=>{NET.on=false;if(NET.role!=='client')return;const s=$('#joinStatus');if(s)s.textContent='Ligação perdida. A tentar de novo…';if(NET.started)toast('Ligação perdida. A tentar de novo…');retryConn()});
 }
 let lastToast='';function toastOnce(t){if(t!==lastToast){lastToast=t;toast(t)}}
-function sendHello(){if(NET.conn&&NET.conn.open)NET.conn.send({t:'hello',pid:NET.pid,name:JOIN.name,level:JOIN.level,color:JOIN.color})}
+function sendHello(){if(NET.conn&&NET.conn.open)NET.conn.send({t:'hello',pid:NET.pid,name:JOIN.name,level:JOIN.level,color:JOIN.color,seen:recentIds().slice(-1500)})}
 function renderJoinForm(lobby){
   const others=lobby.filter(p=>p.pid!==NET.pid);NET.taken=others.map(p=>p.color);
   if(!JOIN.color||NET.taken.includes(JOIN.color))JOIN.color=PCOLORS.find(c=>!NET.taken.includes(c))||PCOLORS[0];
