@@ -813,6 +813,9 @@ function showQuestion(q,o){
     $('#qfoot').innerHTML=`${v}${q.e?`<p class="expl">${esc(q.e)}</p>`:''}${src}<div class="sbtns" style="padding:0"><button class="btn primary" id="qcont">Continuar</button></div>`;
     $('#qcont').focus({preventScroll:true});$('#qcont').onclick=()=>{closeSheet();o.onAnswer(ok)}};
   btns.forEach(b=>b.onclick=()=>{if(o.all&&!finished){const who=CLICKER||(NET.mode==='phones'?NET.pid:p.pid);pick(who,+b.dataset.k);return}answer(+b.dataset.k)});
+  if(!o.hidden&&!o.quick&&(p.cards.cin||0)>0){const f=$('#qfoot');f.innerHTML='<div class="sbtns" style="padding:0"><button class="btn" id="use5050">Usar a carta 50/50</button></div>';
+    $('#use5050').onclick=()=>{const who=CLICKER||(NET.on&&NET.mode==='phones'?NET.pid:p.pid);if(NET.on&&who!==p.pid)return;if(done||p.cards.cin<1)return;
+      p.cards.cin--;shuffle(btns.filter(b=>+b.dataset.k!==0)).slice(0,2).forEach(b=>{b.disabled=true;b.classList.add('off')});f.innerHTML='';renderPlayers()}}
   if(o.timer)runTimer(o.timer,()=>o.all&&!finished?finishAll():answer(-1));
 }
 let CLICKER=null;
@@ -826,7 +829,7 @@ function save(){if(G&&!G.over)LS.set('tef_save',G)}
 function renderAll(){renderPawns();renderWedges();renderPlayers();document.querySelectorAll('#board .sq.cur').forEach(e=>e.classList.remove('cur'));const p=curP();if(p.pos>=0){const s=document.querySelector(`#board .sq[data-i="${p.pos}"]`);s&&s.classList.add('cur')}}
 function miniPie(pieces){let h='<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true">';for(let k=0;k<7;k++){const a0=-Math.PI/2+k*2*Math.PI/7,a1=a0+2*Math.PI/7;const p0=[20+18*Math.cos(a0),20+18*Math.sin(a0)],p1=[20+18*Math.cos(a1),20+18*Math.sin(a1)];h+=`<path d="M20 20L${p0[0].toFixed(2)} ${p0[1].toFixed(2)}A18 18 0 0 1 ${p1[0].toFixed(2)} ${p1[1].toFixed(2)}Z" fill="${pieces.includes(k)?CATS[k].c:'#173f4d'}" stroke="#0f2f3b" stroke-width="1.5"/>`}return h+'</svg>'}
 function renderPlayers(){
-  $('#players').innerHTML=G.players.map((p,i)=>{const held=[];if(p.cards.seg)held.push('2.ª oportunidade'+(p.cards.seg>1?' ×'+p.cards.seg:''));if(p.cards.dob)held.push('Dobro'+(p.cards.dob>1?' ×'+p.cards.dob:''));if(p.cards.esc)held.push('Escudo'+(p.cards.esc>1?' ×'+p.cards.esc:''));
+  $('#players').innerHTML=G.players.map((p,i)=>{const held=HOLD.filter(k=>p.cards[k]>0).map(k=>HOLDN[k]+(p.cards[k]>1?' ×'+p.cards[k]:''));if(p.frozen)held.push('❄ Congelado');
     return`<div class="pcard ${i===G.turn?'cur':''}"><span class="dot" style="--pc:${p.color}">${esc(initial(p))}</span><div><div class="nm">${esc(p.name)}</div><div class="sub">${LEVELS[p.level].n} · ${p.pieces.length}/${G.need} peças · ${p.correct}/${p.answered} certas</div>${held.length?`<div class="held">${held.map(h=>`<span>${h}</span>`).join('')}</div>`:''}</div><div style="display:flex;align-items:center;gap:8px">${miniPie(p.pieces)}<div class="pts">${p.points}<small>pontos</small></div></div></div>`}).join('');
 }
 function setWho(){const p=curP();$('#who').innerHTML=`<span class="dot" style="--pc:${p.color}">${esc(initial(p))}</span><div><div class="eyebrow">Vez de</div><div class="pname">${esc(p.name)}</div></div>`}
@@ -838,7 +841,9 @@ function startTurn(extra){
   $('#rollBtn').onclick=roll;
   $('#msg').innerHTML=(extra?`<p style="margin:0 0 6px"><strong>${extra}</strong></p>`:'')+(ready(p)?`<p style="margin:0">Já tem ${G.need} peças. Lance o dado e escolha <strong>o centro</strong> para a pergunta final.</p>`:`<p style="margin:0">Faltam ${G.need-p.pieces.length} peças. As peças ganham-se a acertar nas sedes (casas grandes com letra).</p>`);
 }
-function nextPlayer(extra){G.turn=(G.turn+1)%G.players.length;startTurn(extra)}
+function nextPlayer(extra){const n=G.players.length;let skipped=[];
+  for(let i=0;i<n;i++){G.turn=(G.turn+1)%n;const q=curP();if(q.frozen&&n>1){q.frozen=false;skipped.push(esc(q.name));continue}break}
+  startTurn([extra,skipped.length?skipped.join(', ')+' estava congelado e perdeu a vez.':''].filter(Boolean).join(' '))}
 
 async function roll(){
   if(G.phase!=='roll')return;G.phase='rolling';$('#rollBtn').disabled=true;
@@ -893,35 +898,68 @@ function victory(p){G.over=true;LS.del('tef_save');renderAll();confetti(260);sfx
     actor:'host',buttons:NET.on?[{label:'Voltar ao menu',cls:'primary',fn:()=>{netEnd();show('home')}}]:[{label:'Nova partida',cls:'primary',fn:()=>{show('setup');renderSetup()}},{label:'Menu',fn:()=>show('home')}]})}
 
 /* ===== Cartas surpresa ===== */
-const CARDS=[
-  {id:'seg',w:3,t:'Segunda oportunidade',d:'Guarde esta carta. Quando errar uma pergunta, pode tentar outra vez.'},
-  {id:'dob',w:3,t:'Pontuação a dobrar',d:'A sua próxima resposta certa vale o dobro dos pontos.'},
-  {id:'esc',w:2,t:'Escudo',d:'Protege as suas peças da próxima tentativa de roubo.'},
-  {id:'rou',w:2,t:'Roubar uma peça',d:'Escolha um adversário e fique com uma peça que ele tem e a si lhe falta.'},
-  {id:'cat',w:3,t:'Escolha a categoria',d:'Escolha a categoria da sua próxima pergunta.'},
-  {id:'rel',w:2,t:'Desafio relâmpago',d:'Três perguntas seguidas, 15 segundos cada. 10 pontos por resposta certa; acertar as três dá 20 pontos extra e nova jogada.'},
-  {id:'tel',w:2,t:'Atalho para a sede',d:'Salte para a sede de uma categoria que lhe falta e responda logo à pergunta.'},
-  {id:'fam',w:3,t:'A Nossa Família',d:'Uma pergunta sobre a família. Se acertar, ganha 15 pontos e joga outra vez.'}
-];
+const CARDS={
+  seg:{t:'Segunda oportunidade',d:'Guarde esta carta. Quando errar uma pergunta, pode tentar outra vez.'},
+  dob:{t:'Pontuação a dobrar',d:'Guarde esta carta. A sua próxima resposta certa vale o dobro dos pontos.'},
+  esc:{t:'Escudo',d:'Guarde esta carta. Protege as suas peças da próxima tentativa de roubo.'},
+  cin:{t:'50/50',d:'Guarde esta carta. Numa pergunta à sua escolha, tira duas respostas erradas.'},
+  pre:{t:'Prenda',d:'Ganha 20 pontos e joga outra vez.'},
+  rou:{t:'Roubar uma peça',d:'Fique com uma peça de um adversário que ela lhe falte. Cada jogador só pode ser roubado uma vez por partida.'},
+  cat:{t:'Escolha a categoria',d:'Escolha a categoria da sua próxima pergunta.'},
+  rel:{t:'Desafio relâmpago',d:'Três perguntas seguidas, 15 segundos cada. 10 pontos por resposta certa; acertar as três dá 20 pontos extra e nova jogada.'},
+  tel:{t:'Atalho para a sede',d:'Salte para a sede de uma categoria que lhe falta e responda logo à pergunta.'},
+  fam:{t:'A Nossa Família',d:'Uma pergunta sobre a família. Se acertar, ganha 15 pontos e joga outra vez.'},
+  avc:{t:'Vento a favor',d:'Avance 3 casas e responda à casa onde cair.'},
+  rec:{t:'Vento contra',d:'Recue 2 casas e responda à casa onde cair.'},
+  dad:{t:'Dado extra',d:'Lance o dado outra vez, já!'},
+  tro:{t:'Troca de lugar',d:'Troque de lugar com um adversário à sua escolha e jogue outra vez.'},
+  fes:{t:'Festa de família',d:'Todos os jogadores ganham 10 pontos. E joga outra vez.'},
+  con:{t:'Congelar',d:'Escolha um adversário: perde a próxima vez de jogar.'},
+  imp:{t:'Imposto',d:'Paga 10 pontos e passa a vez.'}
+};
+// baralho: cada carta sai uma vez (as mais simpáticas duas) antes de se baralhar de novo
+const DECK=['seg','seg','dob','dob','cin','cin','esc','pre','pre','rou','cat','rel','tel','fam','fam','avc','rec','dad','tro','fes','con','imp'];
+const HOLD=['seg','dob','esc','cin'],HOLDN={seg:'2.ª oportunidade',dob:'Dobro',esc:'Escudo',cin:'50/50'},MAXC=2;
+const nCards=p=>HOLD.reduce((a,k)=>a+(p.cards[k]||0),0);
+// dá uma carta guardável respeitando o máximo de 3; depois chama done(texto)
+function giveCard(p,id,done){p.cards[id]=p.cards[id]||0;
+  if(nCards(p)<MAXC){p.cards[id]++;renderPlayers();return done(`${esc(p.name)} ficou com a carta ${HOLDN[id]}.`)}
+  const has=HOLD.filter(k=>p.cards[k]>0);
+  message({title:'Máximo de 2 cartas',color:'#ffcf4a',actor:String(G.players.indexOf(p)),body:`<p>${esc(p.name)} já tem 2 cartas. Escolha: para ficar com <strong>${HOLDN[id]}</strong>, deite uma fora.</p>`,
+    buttons:has.map(k=>({label:'Deitar fora '+HOLDN[k],fn:()=>{p.cards[k]--;p.cards[id]++;renderPlayers();done(`${esc(p.name)} trocou ${HOLDN[k]} por ${HOLDN[id]}.`)}})).concat([{label:'Não ficar com a nova',cls:'primary',fn:()=>done('')}])})}
 function drawCard(){const p=curP(),fam=LS.get('tef_fam',[]);
-  const deck=CARDS.filter(c=>c.id!=='fam'||fam.length);let tot=deck.reduce((s,c)=>s+c.w,0),r=Math.random()*tot,card=deck[0];for(const c of deck){if((r-=c.w)<0){card=c;break}}
-  sfx.card();const again=()=>startTurn('Carta guardada. Jogue outra vez.');
-  if(['seg','dob','esc'].includes(card.id))return message({title:'Casa surpresa',color:'#ffcf4a',card,buttons:[{label:'Guardar e jogar outra vez',cls:'primary',fn:()=>{p.cards[card.id]++;renderPlayers();again()}}]});
-  if(card.id==='rou'){const opp=G.players.filter((o,i)=>i!==G.turn&&o.pieces.some(k=>!p.pieces.includes(k)));
-    if(!opp.length)return message({title:'Casa surpresa',color:'#ffcf4a',card,body:'<p>Nenhum adversário tem peças que lhe faltem. Recebe 15 pontos de compensação.</p>',buttons:[{label:'Jogar outra vez',cls:'primary',fn:()=>{p.points+=15;startTurn('+15 pontos. Jogue outra vez.')}}]});
-    return message({title:'Casa surpresa',color:'#ffcf4a',card,body:'<p>A quem quer roubar uma peça?</p>',buttons:opp.map(o=>({label:o.name,cls:'catb',color:o.color,fn:()=>steal(o)}))})}
-  if(card.id==='cat')return message({title:'Casa surpresa',color:'#ffcf4a',card,buttons:CATS.map((c,i)=>({label:c.n,cls:'catb',color:c.c,fn:()=>ask(i,{})}))});
-  if(card.id==='rel')return message({title:'Casa surpresa',color:'#ffcf4a',card,buttons:[{label:'Começar o desafio',cls:'primary',fn:lightning}]});
-  if(card.id==='tel'){const miss=CATS.map((c,i)=>i).filter(i=>!p.pieces.includes(i));
-    if(!miss.length)return message({title:'Casa surpresa',color:'#ffcf4a',card,body:'<p>Já tem todas as peças. Recebe 20 pontos.</p>',buttons:[{label:'Jogar outra vez',cls:'primary',fn:()=>{p.points+=20;startTurn('+20 pontos. Jogue outra vez.')}}]});
+  let id=null;for(let i=0;i<60&&!id;i++){if(!G.deck||!G.deck.length)G.deck=shuffle(DECK);const c=G.deck.shift();if(c!=='fam'||fam.length)id=c}
+  const card=CARDS[id];sfx.card();const M=(o)=>message(Object.assign({title:'Casa surpresa',color:'#ffcf4a',card},o));
+  const again=t=>startTurn(t||'Jogue outra vez.');
+  if(HOLD.includes(id))return M({buttons:[{label:'Guardar e jogar outra vez',cls:'primary',fn:()=>giveCard(p,id,t=>again(t?t+' Jogue outra vez.':''))}]});
+  if(id==='pre')return M({buttons:[{label:'Receber 20 pontos',cls:'primary',fn:()=>{p.points+=20;again('+20 pontos. Jogue outra vez.')}}]});
+  if(id==='imp')return M({buttons:[{label:'Pagar e passar a vez',cls:'primary',fn:()=>{p.points=Math.max(0,p.points-10);nextPlayer(`${esc(p.name)} pagou 10 pontos de imposto.`)}}]});
+  if(id==='fes')return M({buttons:[{label:'Viva!',cls:'primary',fn:()=>{G.players.forEach(x=>x.points+=10);confetti(60);again('Todos +10 pontos. Jogue outra vez.')}}]});
+  if(id==='dad')return M({buttons:[{label:'Lançar outra vez',cls:'primary',fn:()=>again('Dado extra! Lance outra vez.')}]});
+  if(id==='avc'||id==='rec'){const n=id==='avc'?3:2,dir=id==='avc'?1:-1;
+    return M({buttons:[{label:id==='avc'?'Avançar 3 casas':'Recuar 2 casas',cls:'primary',fn:async()=>{for(let k=0;k<n;k++){p.pos=(p.pos+dir+N)%N;renderPawns();sfx.step();await sleep(170)}renderAll();await sleep(250);
+      const s=sqInfo(p.pos);if(s.t==='sur')return again('Caiu noutra casa surpresa: jogue outra vez.');resolve(p.pos)}}]})}
+  if(id==='tro'){const opp=G.players.filter((o,i)=>i!==G.turn&&o.pos!==p.pos&&o.pos>=0);
+    if(!opp.length)return M({body:'<p>Não há com quem trocar. Recebe 10 pontos.</p>',buttons:[{label:'Jogar outra vez',cls:'primary',fn:()=>{p.points+=10;again('+10 pontos. Jogue outra vez.')}}]});
+    return M({body:'<p>Com quem quer trocar de lugar?</p>',buttons:opp.map(o=>({label:o.name,cls:'catb',color:o.color,fn:()=>{const t=p.pos;p.pos=o.pos;o.pos=t;renderAll();sfx.step();again(`Trocou de lugar com ${esc(o.name)}. Jogue outra vez.`)}}))})}
+  if(id==='con'){const opp=G.players.filter((o,i)=>i!==G.turn&&!o.frozen);
+    if(!opp.length)return M({body:'<p>Não há ninguém para congelar. Recebe 10 pontos.</p>',buttons:[{label:'Continuar',cls:'primary',fn:()=>{p.points+=10;nextPlayer()}}]});
+    return M({body:'<p>Quem fica congelado (perde a próxima vez)?</p>',buttons:opp.map(o=>({label:o.name,cls:'catb',color:o.color,fn:()=>{o.frozen=true;renderPlayers();nextPlayer(`${esc(o.name)} está congelado e perde a próxima vez.`)}}))})}
+  if(id==='rou'){const opp=G.players.filter((o,i)=>i!==G.turn&&!o.robbed&&o.pieces.some(k=>!p.pieces.includes(k)));
+    if(!opp.length)return M({body:'<p>Não há ninguém a quem roubar (cada jogador só pode ser roubado uma vez por partida). Recebe 15 pontos.</p>',buttons:[{label:'Jogar outra vez',cls:'primary',fn:()=>{p.points+=15;again('+15 pontos. Jogue outra vez.')}}]});
+    return M({body:'<p>A quem quer roubar uma peça?</p>',buttons:opp.map(o=>({label:o.name,cls:'catb',color:o.color,fn:()=>steal(o)}))})}
+  if(id==='cat')return M({buttons:CATS.map((c,i)=>({label:c.n,cls:'catb',color:c.c,fn:()=>ask(i,{})}))});
+  if(id==='rel')return M({buttons:[{label:'Começar o desafio',cls:'primary',fn:lightning}]});
+  if(id==='tel'){const miss=CATS.map((c,i)=>i).filter(i=>!p.pieces.includes(i));
+    if(!miss.length)return M({body:'<p>Já tem todas as peças. Recebe 20 pontos.</p>',buttons:[{label:'Jogar outra vez',cls:'primary',fn:()=>{p.points+=20;startTurn('+20 pontos. Jogue outra vez.')}}]});
     const dist=i=>((i*6-p.pos)+N)%N;const target=miss.sort((a,b)=>dist(a)-dist(b))[0];
-    return message({title:'Casa surpresa',color:'#ffcf4a',card,body:`<p>Vai saltar para a <strong>sede de ${CATS[target].n}</strong>.</p>`,buttons:[{label:'Saltar',cls:'primary',fn:async()=>{p.pos=target*6;renderAll();sfx.step();await sleep(450);ask(target,{hq:true})}}]})}
-  if(card.id==='fam'){const f=shuffle(fam).sort((a,b)=>(a.n||0)-(b.n||0))[0];const q={id:f.id,c:'fam',d:2,q:f.q,a:f.a,e:f.e};
-    return message({title:'Casa surpresa',color:'#ffcf4a',card,buttons:[{label:'Responder',cls:'primary',fn:()=>showQuestion(q,{player:p,timer:G.timer,allowSecond:true,tag:'Carta surpresa',onAnswer:ok=>{p.answered++;if(ok){p.correct++;const{pts}=addPoints(p,15);startTurn(`Acertou! +${pts} pontos. Jogue outra vez.`)}else nextPlayer(`${esc(p.name)} errou. Passa a vez.`)}})}]})}
+    return M({body:`<p>Vai saltar para a <strong>sede de ${CATS[target].n}</strong>.</p>`,buttons:[{label:'Saltar',cls:'primary',fn:async()=>{p.pos=target*6;renderAll();sfx.step();await sleep(450);ask(target,{hq:true})}}]})}
+  if(id==='fam'){const f=shuffle(fam).sort((a,b)=>(a.n||0)-(b.n||0))[0];const q={id:f.id,c:'fam',d:2,q:f.q,a:f.a,e:f.e};
+    return M({buttons:[{label:'Responder',cls:'primary',fn:()=>showQuestion(q,{player:p,timer:G.timer,allowSecond:true,tag:'Carta surpresa',onAnswer:ok=>{p.answered++;if(ok){p.correct++;const{pts}=addPoints(p,15);startTurn(`Acertou! +${pts} pontos. Jogue outra vez.`)}else nextPlayer(`${esc(p.name)} errou. Passa a vez.`)}})}]})}
 }
 function steal(o){const p=curP();
   if(o.cards.esc>0){o.cards.esc--;renderPlayers();return message({title:'Bloqueado pelo escudo',color:o.color,body:`<p>${esc(o.name)} usou o Escudo e protegeu as suas peças.</p>`,buttons:[{label:'Passar a vez',cls:'primary',fn:()=>nextPlayer()}]})}
-  const k=rnd(o.pieces.filter(x=>!p.pieces.includes(x)));o.pieces=o.pieces.filter(x=>x!==k);p.pieces.push(k);renderAll();sfx.evil('Mwahahaha! Esta peça agora é minha!');
+  o.robbed=true;const k=rnd(o.pieces.filter(x=>!p.pieces.includes(x)));o.pieces=o.pieces.filter(x=>x!==k);p.pieces.push(k);renderAll();sfx.evil('Mwahahaha! Esta peça agora é minha!');
   message({title:'Peça roubada!',color:CATS[k].c,body:`<p>${esc(p.name)} ficou com a peça de <strong>${CATS[k].n}</strong> de ${esc(o.name)}.</p>`,buttons:[{label:'Passar a vez',cls:'primary',fn:()=>nextPlayer()}]})}
 function lightning(){const p=curP();let n=0,hits=0;
   const one=()=>{if(n===3){const bonus=hits===3?20:0;p.points+=hits*10+bonus;renderPlayers();
@@ -932,7 +970,7 @@ function lightning(){const p=curP();let n=0,hits=0;
 
 /* ===== Duelo ===== */
 function startDuel(){const p=curP(),opp=G.players.filter((o,i)=>i!==G.turn);sfx.evil('Duelo!');
-  message({title:'Duelo!',color:'#e9e4d6',body:'<p>Escolha um adversário. Os dois respondem à mesma pergunta, à vez, sem ver a resposta do outro.</p><p>Se só um acertar, ganha 20 pontos. Se ambos acertarem, cada um ganha 10.</p>',buttons:opp.map(o=>({label:o.name,cls:'catb',color:o.color,fn:()=>duel(o)}))})}
+  message({title:'Duelo!',color:'#e9e4d6',body:'<p>Escolha um adversário. Os dois respondem à mesma pergunta, à vez, sem ver a resposta do outro.</p><p>Se ganhar, leva 20 pontos e <strong>rouba uma carta a um colega</strong>. Mas cuidado: se só o adversário acertar, é ele que lhe rouba uma carta. Se ambos acertarem, cada um ganha 10 pontos.</p>',buttons:opp.map(o=>({label:o.name,cls:'catb',color:o.color,fn:()=>duel(o)}))})}
 function duel(o){const p=curP(),c=Math.floor(Math.random()*7),q=pickQ(c,p,2);
   showQuestion(q,{player:p,timer:G.timer,hidden:true,tag:'Duelo · responda em segredo',onAnswer:okA=>{
     if(NET.on)return showQuestion(q,{player:o,timer:G.timer,tag:'Duelo',onAnswer:okB=>duelEnd(p,o,okA,okB)});
@@ -940,10 +978,18 @@ function duel(o){const p=curP(),c=Math.floor(Math.random()*7),q=pickQ(c,p,2);
       showQuestion(q,{player:o,timer:G.timer,tag:'Duelo',onAnswer:okB=>duelEnd(p,o,okA,okB)})}}]})}})}
 function duelEnd(p,o,a,b){p.answered++;o.answered++;if(a)p.correct++;if(b)o.correct++;let t,next;
   if(a&&b){p.points+=10;o.points+=10;t='Ambos acertaram: +10 pontos para cada um.';next=()=>startTurn('Duelo empatado. Jogue outra vez.')}
-  else if(a){p.points+=20;t=`${esc(p.name)} ganhou o duelo: +20 pontos.`;next=()=>startTurn('Ganhou o duelo! Jogue outra vez.')}
-  else if(b){o.points+=20;t=`${esc(o.name)} ganhou o duelo: +20 pontos.`;next=()=>nextPlayer()}
+  else if(a){p.points+=20;t=`${esc(p.name)} ganhou o duelo: +20 pontos e rouba uma carta a um colega.`;next=()=>duelSteal(p,null,m=>startTurn((m?m+' ':'')+'Ganhou o duelo! Jogue outra vez.'))}
+  else if(b){o.points+=20;t=`${esc(o.name)} ganhou o duelo: +20 pontos e rouba uma carta a ${esc(p.name)}.`;next=()=>duelSteal(o,p,m=>nextPlayer(m))}
   else{t='Ninguém acertou.';next=()=>nextPlayer()}
   renderPlayers();message({title:'Resultado do duelo',color:'#e9e4d6',body:`<p>${esc(p.name)}: ${a?'certo':'errado'} · ${esc(o.name)}: ${b?'certo':'errado'}</p><p><strong>${t}</strong></p>`,buttons:[{label:'Continuar',cls:'primary',fn:next}]})}
+
+// quem ganha o duelo rouba uma carta guardada (à sorte) a um colega; se ninguém tiver cartas, recebe uma nova
+function duelSteal(w,from,done){const take=v=>{const ks=HOLD.filter(k=>v.cards[k]>0);const k=rnd(ks);v.cards[k]--;renderPlayers();sfx.evil('Esta carta agora é minha!');
+    giveCard(w,k,m=>done(`${esc(w.name)} roubou a carta ${HOLDN[k]} a ${esc(v.name)}.`+(m&&m.includes('trocou')?' '+m:'')))};
+  const pool=(from?[from]:G.players.filter(x=>x!==w)).filter(x=>nCards(x)>0);
+  if(!pool.length){const k=rnd(HOLD);return giveCard(w,k,m=>done(from?`${esc(from.name)} não tinha cartas. ${m}`:`Ninguém tinha cartas. ${m}`))}
+  if(pool.length===1)return take(pool[0]);
+  message({title:'Roubar uma carta',color:'#e9e4d6',actor:String(G.players.indexOf(w)),body:`<p>${esc(w.name)}, a quem quer roubar uma carta? (sai uma à sorte)</p>`,buttons:pool.map(x=>({label:`${x.name} (${nCards(x)})`,cls:'catb',color:x.color,fn:()=>take(x)}))})}
 
 /* ================= CONFETTI ================= */
 function confetti(n){if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;const cv=$('#confetti'),ctx=cv.getContext('2d');cv.width=innerWidth;cv.height=innerHeight;
@@ -963,7 +1009,7 @@ $('#btnFamily').onclick=()=>show('family');
 const RULES=`<div class="mband"></div><h2 class="mtitle">Como jogar</h2><div class="rules">
 <h3>O objetivo</h3><p>Conquistar as peças das categorias (7 na partida completa, 4 na rápida), ir ao centro do tabuleiro e acertar na pergunta final.</p>
 <h3>Cada jogada</h3><ul><li>Lance o dado e escolha se avança ou recua.</li><li>A cor da casa define a categoria da pergunta.</li><li>Se acertar, ganha pontos (10, 20 ou 30 conforme a dificuldade) e joga outra vez.</li><li>Se errar, passa a vez.</li></ul>
-<h3>As casas</h3><ul><li><strong>Sedes</strong> (casas grandes com letra): acertar dá a peça dessa categoria.</li><li><strong>?</strong> Casa surpresa: tira uma carta (segunda oportunidade, dobro, escudo, roubo, relâmpago e outras).</li><li><strong>VS</strong> Casa de duelo: desafia um adversário para a mesma pergunta.</li></ul>
+<h3>As casas</h3><ul><li><strong>Sedes</strong> (casas grandes com letra): acertar dá a peça dessa categoria.</li><li><strong>?</strong> Casa surpresa: tira uma carta do baralho (prenda, 50/50, vento a favor, troca de lugar, congelar, roubo e muitas outras). Só volta a sair a mesma carta depois de saírem as outras.</li><li><strong>VS</strong> Casa de duelo: desafia um adversário para a mesma pergunta. Quem ganhar rouba uma carta.</li></ul><h3>Cartas guardadas</h3><p>Segunda oportunidade, Dobro, Escudo e 50/50. Cada jogador só pode ter <strong>2 cartas</strong>; se ganhar mais uma, escolhe com quais fica. Cada jogador só pode perder uma peça por roubo em cada partida.</p>
 <h3>Pergunta final</h3><p>Com as peças todas, qualquer lançamento permite ir ao centro. Os adversários escolhem a categoria. Se errar, volta à casa onde estava.</p>
 <h3>Níveis</h3><p>Criança, Jovem e Adulto mudam a mistura de perguntas fáceis, médias e difíceis de cada jogador. As perguntas não se repetem na mesma partida e o jogo prefere as que ainda não saíram nos últimos 30 e 90 dias.</p></div>
 <div class="sbtns"><button class="btn primary" id="closeRules">Fechar</button></div>`;
@@ -992,7 +1038,7 @@ $('#startGame').onclick=()=>{
   if(names.some(n=>!n)){$('#setupErr').textContent='Todos os jogadores precisam de um nome.';return}
   if(new Set(names.map(n=>n.toLowerCase())).size!==names.length){$('#setupErr').textContent='Há nomes repetidos. Use nomes diferentes para o histórico de cada jogador funcionar.';return}
   LS.set('tef_setup',SET);
-  G={players:SET.players.map((p,i)=>({name:p.name.trim(),color:p.color,level:p.level,pos:0,pieces:[],points:0,cards:{seg:0,dob:0,esc:0},correct:0,answered:0})),turn:Math.floor(Math.random()*SET.players.length),need:SET.need,timer:SET.timer,used:[],over:false};
+  G={players:SET.players.map((p,i)=>({name:p.name.trim(),color:p.color,level:p.level,pos:0,pieces:[],points:0,cards:{seg:0,dob:0,esc:0,cin:0},correct:0,answered:0})),turn:Math.floor(Math.random()*SET.players.length),need:SET.need,timer:SET.timer,used:[],over:false};
   enterGame();toast(`Começa ${G.players[G.turn].name}, sorteado ao acaso.`);
 };
 
@@ -1125,7 +1171,7 @@ $('#lobbyStart').onclick=()=>{
   const all=lobbyAll();if(all.length<2)return;
   if(LOB.mode==='phones'&&!(LOB.me.name||'').trim()){toast('Escreva o seu nome antes de começar.');$('#meName').focus();return}
   NET.started=true;NET.mode=LOB.mode;
-  G={players:all.map(p=>({pid:p.pid,name:p.name,color:p.color,level:p.level,pos:0,pieces:[],points:0,cards:{seg:0,dob:0,esc:0},correct:0,answered:0})),turn:Math.floor(Math.random()*all.length),need:LOB.need,timer:LOB.timer,used:[],over:false,net:true};
+  G={players:all.map(p=>({pid:p.pid,name:p.name,color:p.color,level:p.level,pos:0,pieces:[],points:0,cards:{seg:0,dob:0,esc:0,cin:0},correct:0,answered:0})),turn:Math.floor(Math.random()*all.length),need:LOB.need,timer:LOB.timer,used:[],over:false,net:true};
   NET.hostIdx=G.players.findIndex(p=>p.pid===NET.pid);
   for(const k in NET.conns){const c=NET.conns[k];if(c.open)try{c.send({t:'start'})}catch(_){}}
   document.body.classList.toggle('tvhost',LOB.mode==='tv');
@@ -1150,7 +1196,7 @@ function broadcast(force){
     const lock=!(actor==='host'||actor==='none'||canAct(actor,NET.hostIdx)||away||othersAway);
     $('#scard').classList.toggle('locked',lock&&sheetOn);$('#act').classList.toggle('locked',lock&&!sheetOn)}
   const snap={qid:sheetOn?($('#scard').dataset.qid||''):'',sheet:sheetOn?$('#scard').innerHTML:null,cc:$('#scard').style.getPropertyValue('--cc'),act:$('#act').innerHTML,msg:$('#msg').innerHTML,actor};
-  const g={players:G.players.map(p=>({pid:p.pid,name:p.name,color:p.color,level:p.level,pos:p.pos,pieces:p.pieces,points:p.points,cards:p.cards,correct:p.correct,answered:p.answered})),turn:G.turn,need:G.need,over:G.over};
+  const g={players:G.players.map(p=>({pid:p.pid,name:p.name,color:p.color,level:p.level,pos:p.pos,pieces:p.pieces,points:p.points,cards:p.cards,frozen:!!p.frozen,correct:p.correct,answered:p.answered})),turn:G.turn,need:G.need,over:G.over};
   const s=JSON.stringify([g,snap]);if(!force&&s===NET.last)return;NET.last=s;
   const msg={t:'st',g,snap,mode:NET.mode,code:NET.code};
   for(const k in NET.conns){const c=NET.conns[k];if(c.open)try{c.send(msg)}catch(_){}}
