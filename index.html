@@ -573,9 +573,17 @@ function periodo(data){if(!data)return null;const d=(Date.now()-new Date(data+'T
 const dataPT=d=>{try{return new Date(d+'T12:00:00').toLocaleDateString('pt-PT',{day:'numeric',month:'short',year:'numeric'})}catch(e){return d}};
 async function loadNews(){try{const r=await fetch('atualidades.json',{cache:'no-cache'});if(!r.ok)return;const j=await r.json();let n=0;
   (j.perguntas||[]).forEach(x=>{if(!x||!x.id||!Array.isArray(x.a)||x.a.length!==4)return;const age=(Date.now()-new Date(x.data+'T12:00:00').getTime())/864e5;if(age>548)return;
-    if(QBANK.some(q=>q.id==='n-'+x.id))return;QBANK.push({id:'n-'+x.id,c:6,d:x.d||2,q:x.q,a:x.a,e:x.e||'',fonte:x.fonte||'',url:x.url||'',data:x.data||''});n++});
+    if(QBANK.some(q=>q.id==='n-'+x.id))return;QBANK.push({id:'n-'+x.id,c:6,d:x.d||2,t:x.t||'',q:x.q,a:x.a,e:x.e||'',fonte:x.fonte||'',url:x.url||'',data:x.data||''});n++});
   NEWS_INFO={n,atualizado:j.atualizado||''};if($('#home').classList.contains('on'))renderHome()}catch(e){}}
 let NEWS_INFO=null;
+const ATU_SUB={des:'Desporto',pol:'Política',mun:'Mundo e sociedade',cie:'Ciência e tecnologia',cul:'Cultura e espetáculos'};
+function atuSub(q){if(q.t&&ATU_SUB[q.t])return q.t;const s=(q.q+' '+q.a.join(' ')).toLowerCase();
+  if(/eurovis|cinema|filme|canção|cantor|música|nobel da literatura|escritor|livro|óscar|festival|museu|série|exposição/.test(s))return'cul';
+  if(/chatgpt|tecnolog|inteligência artificial|web summit|espac|nasa|\besa\b|satélite|foguet|ciência|cientist|vacina|descobert|internet|telemóvel|robô/.test(s))return'cie';
+  if(/\bpapa\b|conclave|vaticano/.test(s))return'mun';
+  if(/futebol|seleção|clube|liga|taça|mundial de|no mundial|do mundial|o mundial|euro 20|ténis|tenista|ciclis|volta a|olímpic|bola de ouro|fórmula 1|piloto|grande prémio|treinador|golo|jogador|wimbledon|roland garros|atp|davis|fifa|benfica|sporting|fc porto|ronaldo|campeões|campeão nacional|estádio|maratona|atleta/.test(s))return'des';
+  if(/eleiç|eleit|president|primeiro-ministr|chanceler|governo|partido|deputad|legislativ|autárquic|câmara|onu\b|comissão europeia|conselho europeu|tomou posse|parlamento|ministr|referendo/.test(s))return'pol';
+  return'mun'}
 const N=42, STEP=2*Math.PI/N;
 
 /* ================= UTILITÁRIOS ================= */
@@ -659,7 +667,7 @@ let toastT=null;
 function toast(t){const el=$('#toast');el.textContent=t;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>el.hidden=true,2600)}
 
 /* ================= TABULEIRO ================= */
-function sqInfo(i){const k=Math.floor(i/6),o=i%6;if(o===0)return{t:'hq',c:k};if(o===3)return{t:k%2===0?'sur':'duel',c:null};return{t:'n',c:(k+{1:2,2:3,4:5,5:6}[o])%7}}
+function sqInfo(i){const k=Math.floor(i/6),o=i%6;if(o===0)return{t:'hq',c:k};if(o===3){if(k===2||k===6)return{t:'sur',c:null};if(k%2===1)return{t:'duel',c:null}}return{t:'n',c:(k+{1:2,2:3,3:4,4:5,5:6}[o])%7}}
 function sqLabel(i){const s=sqInfo(i);if(s.t==='hq')return'Sede de '+CATS[s.c].n;if(s.t==='sur')return'Casa surpresa';if(s.t==='duel')return'Casa de duelo';return CATS[s.c].n}
 function sqColor(i){const s=sqInfo(i);return s.t==='sur'?'#ffcf4a':s.t==='duel'?'#e9e4d6':CATS[s.c].c}
 const ang=i=>-Math.PI/2+i*STEP;
@@ -707,6 +715,10 @@ const PIPS={1:[5],2:[1,9],3:[1,5,9],4:[1,3,7,9],5:[1,3,5,7,9],6:[1,3,4,6,7,9]};
 function buildDie(){$('#die').innerHTML=[1,2,3,4,5,6].map(v=>`<div class="face f${v}">${PIPS[v].map(c=>`<span style="grid-row:${Math.ceil(c/3)};grid-column:${(c-1)%3+1}"></span>`).join('')}</div>`).join('')}
 const FACE={1:[0,0],6:[0,180],3:[0,-90],4:[0,90],2:[-90,0],5:[90,0]};
 let dieTurns=0;
+function rand01(){try{const u=new Uint32Array(1);crypto.getRandomValues(u);return u[0]/4294967296}catch(e){return Math.random()}}
+function fairRoll(){if(!G.bag||!G.bag.length){const b=[1,2,3,4,5,6,1,2,3,4,5,6];for(let i=b.length-1;i>0;i--){const j=Math.floor(rand01()*(i+1));[b[i],b[j]]=[b[j],b[i]]}G.bag=b}
+  const L=G.lastRolls||[];let idx=0;if(L.length>=2&&L[L.length-1]===L[L.length-2]){const k=G.bag.findIndex(x=>x!==L[L.length-1]);if(k>0)idx=k}
+  const v=G.bag.splice(idx,1)[0];G.lastRolls=L.concat(v).slice(-2);return v}
 function spinDie(v){dieTurns+=2;const[x,y]=FACE[v];$('#die').style.transform=`rotateX(${x+360*dieTurns}deg) rotateY(${y+360*(dieTurns+1)}deg)`}
 
 /* ================= HISTÓRICO / ANTI-REPETIÇÃO ================= */
@@ -716,7 +728,11 @@ function mergeHist(){const h=LS.get('tef_hist',{});for(const k in h)if(!HIST[k]|
 const recentIds=()=>{mergeHist();const lim=Date.now()-90*864e5;return Object.keys(HIST).filter(id=>HIST[id].t>lim)};
 function pickQ(cat,p,forceDiff){mergeHist();const extra=NET.seenExtra||null;
   let pool=QBANK.filter(q=>q.c===cat&&!G.used.includes(q.id));
-  if(!pool.length){G.used=G.used.filter(id=>!id.startsWith(CATS[cat].k));pool=QBANK.filter(q=>q.c===cat)}
+  if(!pool.length){G.used=G.used.filter(id=>!id.startsWith(CATS[cat].k)&&!(cat===6&&id.startsWith('n-')));pool=QBANK.filter(q=>q.c===cat)}
+  // Atualidades: roda pelos subtemas (desporto, política, mundo, ciência, cultura) para não sair sempre o mesmo
+  if(cat===6){const cnt=G.atuSub=G.atuSub||{},subs=[...new Set(pool.map(atuSub))];
+    const min=Math.min(...subs.map(t=>cnt[t]||0)),pickT=rnd(subs.filter(t=>(cnt[t]||0)===min));cnt[pickT]=(cnt[pickT]||0)+1;
+    pool=pool.filter(q=>atuSub(q)===pickT)}
   const want=forceDiff||rollDiff(p.level),now=Date.now(),seen=PSEEN[p.name]||[];
   let best=[],bk=1e9;
   for(const q of pool){const h=HIST[q.id];let tier=0;if(h){const days=(now-h.t)/864e5;tier=days<30?3:days<90?2:1}
@@ -733,8 +749,9 @@ let qTimer=null;
 function openSheet(html,color,actor='host'){const c=$('#scard');c.dataset.actor=actor;c.dataset.qid='';c.style.setProperty('--cc',color||'#1d6f86');c.innerHTML=html;$('#sheet').hidden=false;c.scrollTop=0;const f=c.querySelector('button:not(:disabled)');if(f)f.focus({preventScroll:true})}
 function closeSheet(){stopTimer();$('#sheet').hidden=true}
 function stopTimer(){if(qTimer)cancelAnimationFrame(qTimer);qTimer=null}
-function runTimer(sec,onEnd){stopTimer();const fill=$('#tfill'),num=$('#tnum');if(!fill)return;const t0=performance.now();let lastS=null;
-  const tick=()=>{const left=sec-(performance.now()-t0)/1000;const cs=Math.ceil(left);if(left<5&&left>0&&cs!==lastS){lastS=cs;sfx.tick()}fill.style.width=Math.max(0,left/sec*100)+'%';fill.classList.toggle('low',left<5);if(num)num.textContent=Math.max(0,Math.ceil(left))+' s';
+function runTimer(sec,onEnd){stopTimer();const fill=$('#tfill'),num=$('#tnum');if(!fill)return;let t0=performance.now(),lastS=null,hidAt=null;
+  const tick=()=>{if(document.hidden){if(hidAt===null)hidAt=performance.now();qTimer=requestAnimationFrame(tick);return}if(hidAt!==null){t0+=performance.now()-hidAt;hidAt=null}
+    const left=sec-(performance.now()-t0)/1000;const cs=Math.ceil(left);if(left<5&&left>0&&cs!==lastS){lastS=cs;sfx.tick()}fill.style.width=Math.max(0,left/sec*100)+'%';fill.classList.toggle('low',left<5);if(num)num.textContent=Math.max(0,Math.ceil(left))+' s';
     if(left<=0){qTimer=null;onEnd();return}qTimer=requestAnimationFrame(tick)};qTimer=requestAnimationFrame(tick)}
 function message({title,body='',color,card,buttons=[],actor}){
   let h=`<div class="mband"></div><h2 class="mtitle">${title}</h2>`;
@@ -748,7 +765,9 @@ function showQuestion(q,o){
   const cat=q.c==='fam'?FAMCAT:CATS[q.c],p=o.player,order=shuffle([0,1,2,3]),L='ABCD';
   let secondUsed=false,done=false;
   const per=q.data?periodo(q.data):null;
-  openSheet(`<div class="qhead"><div><div class="qmeta" style="text-align:left">${esc(o.tag||'Pergunta')}${per?' · '+per:''}</div><div class="qcat">${cat.n}</div></div><div class="qmeta">${esc(p.name)}<br>${'●'.repeat(q.d)}${'○'.repeat(3-q.d)}</div></div>
+  // tempo real = tempo escolhido + tempo de leitura (perguntas longas) + margem de ligação em sala
+  if(o.timer){const len=q.q.length+q.a.join(' ').length;o.timer=o.timer+(o.quick?1:2)+Math.min(o.quick?4:13,Math.max(0,Math.round((len-60)/12)))+(NET.on?3:0)}
+  openSheet(`<div class="qhead"><div><div class="qmeta" style="text-align:left">${esc(o.tag||'Pergunta')}${per?' · '+per:''}</div><div class="qcat">${cat.n}${q.c===6?' · '+ATU_SUB[atuSub(q)]:''}</div></div><div class="qmeta">${esc(p.name)}<br>${'●'.repeat(q.d)}${'○'.repeat(3-q.d)}</div></div>
    ${o.timer?'<div class="tbar"><i id="tfill"></i></div><div class="tnum" id="tnum"></div>':''}
    <h2 class="qtext">${esc(q.q)}</h2>
    <div class="opts">${order.map((k,j)=>`<button class="opt" data-k="${k}"><b>${L[j]}</b><span>${esc(q.a[k])}</span></button>`).join('')}</div>
@@ -769,7 +788,7 @@ function showQuestion(q,o){
     answer(p.pid in ans?ans[p.pid]:-1)};
   const pick=(who,k)=>{if(finished||who in ans)return;ans[who]=k;beep(500,.04);updWho();
     const waiting=others.filter(x=>live(x)&&!(x.pid in ans));
-    if(p.pid in ans){if(!waiting.length)return finishAll();if(!grace){grace=setTimeout(finishAll,10000);updWho()}}
+    if(p.pid in ans){if(!waiting.length)return finishAll();if(!grace&&!o.timer){grace=setTimeout(finishAll,20000);updWho()}}
     else if(!waiting.length&&!live(p))finishAll()};
   const answer=k=>{if(done)return;stopTimer();const ok=k===0;
     if(o.hidden){done=true;btns.forEach(b=>{b.disabled=true;if(+b.dataset.k===k&&!NET.on)b.classList.add('picked')});beep(500,.06);setTimeout(()=>{closeSheet();o.onAnswer(ok)},450);return}
@@ -817,7 +836,7 @@ function nextPlayer(extra){G.turn=(G.turn+1)%G.players.length;startTurn(extra)}
 
 async function roll(){
   if(G.phase!=='roll')return;G.phase='rolling';$('#rollBtn').disabled=true;
-  const v=1+Math.floor(Math.random()*6);spinDie(v);beep(300,.05,'triangle');setTimeout(()=>beep(360,.05,'triangle'),250);setTimeout(()=>beep(420,.05,'triangle'),500);
+  const v=fairRoll();spinDie(v);beep(300,.05,'triangle');setTimeout(()=>beep(360,.05,'triangle'),250);setTimeout(()=>beep(420,.05,'triangle'),500);
   await sleep(1050);
   const p=curP(),from=p.pos<0?0:p.pos;
   const dests=[];const f=(from+v)%N,b=(from-v+N)%N;
@@ -874,7 +893,7 @@ const CARDS=[
   {id:'esc',w:2,t:'Escudo',d:'Protege as suas peças da próxima tentativa de roubo.'},
   {id:'rou',w:2,t:'Roubar uma peça',d:'Escolha um adversário e fique com uma peça que ele tem e a si lhe falta.'},
   {id:'cat',w:3,t:'Escolha a categoria',d:'Escolha a categoria da sua próxima pergunta.'},
-  {id:'rel',w:2,t:'Desafio relâmpago',d:'Três perguntas seguidas, 10 segundos cada. 10 pontos por resposta certa; acertar as três dá 20 pontos extra e nova jogada.'},
+  {id:'rel',w:2,t:'Desafio relâmpago',d:'Três perguntas seguidas, 15 segundos cada. 10 pontos por resposta certa; acertar as três dá 20 pontos extra e nova jogada.'},
   {id:'tel',w:2,t:'Atalho para a sede',d:'Salte para a sede de uma categoria que lhe falta e responda logo à pergunta.'},
   {id:'fam',w:3,t:'A Nossa Família',d:'Uma pergunta sobre a família. Se acertar, ganha 15 pontos e joga outra vez.'}
 ];
@@ -902,7 +921,7 @@ function lightning(){const p=curP();let n=0,hits=0;
   const one=()=>{if(n===3){const bonus=hits===3?20:0;p.points+=hits*10+bonus;renderPlayers();
       return message({title:`Desafio relâmpago: ${hits} de 3`,color:'#ffcf4a',body:`<p>Ganhou ${hits*10+bonus} pontos${bonus?' (inclui 20 extra)':''}.</p>`,buttons:[{label:hits===3?'Jogar outra vez':'Passar a vez',cls:'primary',fn:()=>hits===3?startTurn('Desafio perfeito! Jogue outra vez.'):nextPlayer()}]})}
     n++;const c=Math.floor(Math.random()*7),q=pickQ(c,p);
-    showQuestion(q,{player:p,timer:10,quick:true,tag:`Relâmpago ${n} de 3`,onAnswer:ok=>{p.answered++;if(ok){p.correct++;hits++}one()}})};
+    showQuestion(q,{player:p,timer:15,quick:true,tag:`Relâmpago ${n} de 3`,onAnswer:ok=>{p.answered++;if(ok){p.correct++;hits++}one()}})};
   one()}
 
 /* ===== Duelo ===== */

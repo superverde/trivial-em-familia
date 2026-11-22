@@ -37,9 +37,11 @@ Criar o ficheiro `dados-auto/AAAA-MM-DD-HHMM.json` (data e hora desta execução
 Juntar as perguntas ao fim da lista `perguntas` em `atualidades.json` e atualizar `"atualizado"` para a data de hoje. Formato de cada pergunta:
 
 ```json
-{"id":"AAAAMMDD-NN","d":2,"q":"Pergunta?","a":["Certa","Errada 1","Errada 2","Errada 3"],"e":"Explicação.","fonte":"RTP / Lusa","url":"https://…","data":"AAAA-MM-DD"}
+{"id":"AAAAMMDD-NN","d":2,"t":"pol","q":"Pergunta?","a":["Certa","Errada 1","Errada 2","Errada 3"],"e":"Explicação.","fonte":"RTP / Lusa","url":"https://…","data":"AAAA-MM-DD"}
 ```
 
+- **Subtema obrigatório** no campo `t`: `pol` (política), `mun` (mundo e sociedade, clima, economia), `cie` (ciência e tecnologia), `cul` (cultura e espetáculos) ou `des` (desporto). O jogo roda pelos subtemas, por isso é preciso haver perguntas de todos.
+- **Distribuição das 15 por dia:** no máximo **2 de desporto**; as restantes repartidas por `pol`, `mun`, `cie` e `cul` (pelo menos 3 de cada, sempre que haja notícias verificáveis). O banco atual tem desporto a mais: até equilibrar, dar prioridade a `cie` e `cul`.
 - Notícias **dos últimos dias** (sobretudo das últimas 24–72 h; se faltarem, até 30 dias), cerca de metade de Portugal e metade do mundo: política, economia, ciência, tecnologia, desporto, cultura, sociedade.
 - **Validação automática obrigatória**: cada facto confirmado em **pelo menos 2 fontes credíveis** e independentes (RTP, Lusa, Público, Expresso, Observador, Renascença, SIC Notícias, Diário de Notícias, Reuters, AP, BBC, AFP, sites oficiais do Governo, da UE, da ONU, das federações…). Se não houver 2 fontes, não entra.
 - `data` = data do acontecimento; `url` = uma das fontes; `fonte` = nomes das fontes.
