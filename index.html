@@ -145,6 +145,8 @@ label.lbl{display:block;font-weight:800;margin-bottom:6px}
 @keyframes up{from{transform:translateY(30px);opacity:.4}to{transform:none;opacity:1}}
 .qhead{background:var(--cc);padding:14px 20px 12px;display:flex;justify-content:space-between;align-items:flex-end;gap:10px;color:#10232a}
 .qcat{font-family:var(--fd);font-weight:800;font-size:1.35rem}
+.qgrace{display:inline-block;background:#ffcf4a;color:#10232a;border-radius:12px;padding:6px 12px;font-size:1.05rem;animation:pulse 1s ease-in-out infinite}.qgrace b{font-size:1.25rem}
+@keyframes pulse{50%{transform:scale(1.04)}}
 .qmeta{font-weight:800;font-size:.85rem;opacity:.85;text-align:right}
 .tbar{height:8px;background:#e5dfd0;position:relative}
 .tbar i{position:absolute;left:0;top:0;bottom:0;background:#1d6f86;width:100%}
@@ -745,13 +747,13 @@ function useQ(q,p){if(q.c==='fam'){const f=LS.get('tef_fam',[]);const it=f.find(
   const s=PSEEN[p.name]=PSEEN[p.name]||[];if(!s.includes(q.id)){s.push(q.id);if(s.length>3000)s.shift()}LS.set('tef_pseen',PSEEN)}
 
 /* ================= FOLHA (perguntas e mensagens) ================= */
-let qTimer=null;
+let qTimer=null,qLeft=null;
 function openSheet(html,color,actor='host'){const c=$('#scard');c.dataset.actor=actor;c.dataset.qid='';c.style.setProperty('--cc',color||'#1d6f86');c.innerHTML=html;$('#sheet').hidden=false;c.scrollTop=0;const f=c.querySelector('button:not(:disabled)');if(f)f.focus({preventScroll:true})}
 function closeSheet(){stopTimer();$('#sheet').hidden=true}
 function stopTimer(){if(qTimer)cancelAnimationFrame(qTimer);qTimer=null}
 function runTimer(sec,onEnd){stopTimer();const fill=$('#tfill'),num=$('#tnum');if(!fill)return;let t0=performance.now(),lastS=null,hidAt=null;
   const tick=()=>{if(document.hidden){if(hidAt===null)hidAt=performance.now();qTimer=requestAnimationFrame(tick);return}if(hidAt!==null){t0+=performance.now()-hidAt;hidAt=null}
-    const left=sec-(performance.now()-t0)/1000;const cs=Math.ceil(left);if(left<5&&left>0&&cs!==lastS){lastS=cs;sfx.tick()}fill.style.width=Math.max(0,left/sec*100)+'%';fill.classList.toggle('low',left<5);if(num)num.textContent=Math.max(0,Math.ceil(left))+' s';
+    const left=sec-(performance.now()-t0)/1000;qLeft=left;const cs=Math.ceil(left);if(left<5&&left>0&&cs!==lastS){lastS=cs;sfx.tick()}fill.style.width=Math.max(0,left/sec*100)+'%';fill.classList.toggle('low',left<5);if(num)num.textContent=Math.max(0,Math.ceil(left))+' s';
     if(left<=0){qTimer=null;onEnd();return}qTimer=requestAnimationFrame(tick)};qTimer=requestAnimationFrame(tick)}
 function message({title,body='',color,card,buttons=[],actor}){
   let h=`<div class="mband"></div><h2 class="mtitle">${title}</h2>`;
@@ -779,8 +781,12 @@ function showQuestion(q,o){
   const ans={},others=o.all?G.players.filter(x=>x!==p):[];let grace=null,finished=false;
   const live=x=>x.pid===NET.pid?NET.mode==='phones':connOpen(x.pid);
   const updWho=()=>{const el=$('#qwho');if(!el)return;const done=G.players.filter(x=>x.pid in ans).map(x=>esc(x.name));
-    el.innerHTML=(done.length?'Já responderam: <strong>'+done.join(', ')+'</strong>':'Todos respondem! Quem tem a vez ganha os pontos todos; os outros ganham metade.')+(grace?' · a fechar em breve…':'')};
-  const finishAll=()=>{if(finished)return;finished=true;clearTimeout(grace);grace=null;
+    el.innerHTML=(done.length?'Já responderam: <strong>'+done.join(', ')+'</strong>':'Todos respondem! Quem tem a vez ganha os pontos todos; os outros ganham metade.')+'';if(graceLeft!==null)el.innerHTML=`<span class="qgrace"><strong>${esc(p.name)} já respondeu!</strong> Os outros têm <b>${graceLeft} s</b> para responder.</span>`+(done.length>1?'<br>Já responderam: '+done.join(', '):'')};
+  let graceLeft=null;
+  const startGrace=()=>{if(grace)return;graceLeft=Math.max(1,Math.min(10,qLeft!==null&&o.timer?Math.ceil(qLeft):10));
+    stopTimer();const fill=$('#tfill');if(fill)runTimer(graceLeft,finishAll);sfx.tick();updWho();
+    grace=setInterval(()=>{graceLeft--;if(graceLeft<=0){clearInterval(grace);grace=null;return finishAll()}if(graceLeft<=3)sfx.tick();updWho()},1000)};
+  const finishAll=()=>{if(finished)return;finished=true;clearInterval(grace);grace=null;graceLeft=null;stopTimer();
     const half=Math.round(PTS[q.d]/2),hits=[];
     others.forEach(x=>{if(!(x.pid in ans))return;x.answered++;if(ans[x.pid]===0){x.correct++;x.points+=half;hits.push(esc(x.name))}});
     o.othersHtml=others.length?`<p class="expl"><strong>Os outros:</strong> ${hits.length?hits.join(', ')+' acert'+(hits.length>1?'aram':'ou')+` (+${half} pontos)`:'ninguém acertou'}.</p>`:'';
@@ -788,7 +794,7 @@ function showQuestion(q,o){
     answer(p.pid in ans?ans[p.pid]:-1)};
   const pick=(who,k)=>{if(finished||who in ans)return;ans[who]=k;beep(500,.04);updWho();
     const waiting=others.filter(x=>live(x)&&!(x.pid in ans));
-    if(p.pid in ans){if(!waiting.length)return finishAll();if(!grace&&!o.timer){grace=setTimeout(finishAll,20000);updWho()}}
+    if(p.pid in ans){if(!waiting.length)return finishAll();startGrace()}
     else if(!waiting.length&&!live(p))finishAll()};
   const answer=k=>{if(done)return;stopTimer();const ok=k===0;
     if(o.hidden){done=true;btns.forEach(b=>{b.disabled=true;if(+b.dataset.k===k&&!NET.on)b.classList.add('picked')});beep(500,.06);setTimeout(()=>{closeSheet();o.onAnswer(ok)},450);return}
