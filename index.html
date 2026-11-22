@@ -730,7 +730,7 @@ function useQ(q,p){if(q.c==='fam'){const f=LS.get('tef_fam',[]);const it=f.find(
 
 /* ================= FOLHA (perguntas e mensagens) ================= */
 let qTimer=null;
-function openSheet(html,color,actor='host'){const c=$('#scard');c.dataset.actor=actor;c.style.setProperty('--cc',color||'#1d6f86');c.innerHTML=html;$('#sheet').hidden=false;c.scrollTop=0;const f=c.querySelector('button:not(:disabled)');if(f)f.focus({preventScroll:true})}
+function openSheet(html,color,actor='host'){const c=$('#scard');c.dataset.actor=actor;c.dataset.qid='';c.style.setProperty('--cc',color||'#1d6f86');c.innerHTML=html;$('#sheet').hidden=false;c.scrollTop=0;const f=c.querySelector('button:not(:disabled)');if(f)f.focus({preventScroll:true})}
 function closeSheet(){stopTimer();$('#sheet').hidden=true}
 function stopTimer(){if(qTimer)cancelAnimationFrame(qTimer);qTimer=null}
 function runTimer(sec,onEnd){stopTimer();const fill=$('#tfill'),num=$('#tnum');if(!fill)return;const t0=performance.now();let lastS=null;
@@ -754,7 +754,7 @@ function showQuestion(q,o){
    <div class="opts">${order.map((k,j)=>`<button class="opt" data-k="${k}"><b>${L[j]}</b><span>${esc(q.a[k])}</span></button>`).join('')}</div>
    ${o.all?'<p class="qwho" id="qwho">Todos respondem! Quem tem a vez ganha os pontos todos; os outros ganham metade.</p>':''}
    <div id="qfoot"></div>`,cat.c,o.all?'all':String(G.players.indexOf(p)));
-  useQ(q,p);
+  useQ(q,p);$('#scard').dataset.qid=q.c==='fam'?'':q.id;
   const btns=[...document.querySelectorAll('#scard .opt')];
   // modo «todos respondem»: guarda a resposta de cada jogador e só revela no fim
   const ans={},others=o.all?G.players.filter(x=>x!==p):[];let grace=null,finished=false;
@@ -1124,7 +1124,7 @@ function broadcast(force){
     const othersAway=actor==='others'&&G.players.every((p,i)=>i===G.turn||p.pid===NET.pid||!connOpen(p.pid));
     const lock=!(actor==='host'||actor==='none'||canAct(actor,NET.hostIdx)||away||othersAway);
     $('#scard').classList.toggle('locked',lock&&sheetOn);$('#act').classList.toggle('locked',lock&&!sheetOn)}
-  const snap={sheet:sheetOn?$('#scard').innerHTML:null,cc:$('#scard').style.getPropertyValue('--cc'),act:$('#act').innerHTML,msg:$('#msg').innerHTML,actor};
+  const snap={qid:sheetOn?($('#scard').dataset.qid||''):'',sheet:sheetOn?$('#scard').innerHTML:null,cc:$('#scard').style.getPropertyValue('--cc'),act:$('#act').innerHTML,msg:$('#msg').innerHTML,actor};
   const g={players:G.players.map(p=>({pid:p.pid,name:p.name,color:p.color,level:p.level,pos:p.pos,pieces:p.pieces,points:p.points,cards:p.cards,correct:p.correct,answered:p.answered})),turn:G.turn,need:G.need,over:G.over};
   const s=JSON.stringify([g,snap]);if(!force&&s===NET.last)return;NET.last=s;
   const msg={t:'st',g,snap,mode:NET.mode,code:NET.code};
@@ -1203,6 +1203,8 @@ function renderClient(d){
   if(d.mode!=='tv'){renderPawns();renderWedges()}
   renderPlayers();setWho();
   const s=d.snap,actor=s.actor,mine=canAct(actor,me);
+  if(s.qid&&s.qid!==renderClient.lastQ){renderClient.lastQ=s.qid;try{mergeHist();const h=HIST[s.qid]||{n:0};HIST[s.qid]={t:Date.now(),n:h.n+1};LS.set('tef_hist',HIST);
+    const nm=me>=0?G.players[me].name:(JOIN.name||'');if(nm){const a=PSEEN[nm]=PSEEN[nm]||[];if(!a.includes(s.qid)){a.push(s.qid);if(a.length>3000)a.shift()}LS.set('tef_pseen',PSEEN)}}catch(e){}}
   $('#act').innerHTML=s.act;$('#msg').innerHTML=s.msg;
   if(!s.sheet&&actor===String(me)&&me>=0)$('#act').insertAdjacentHTML('afterbegin','<div class="myturn">É a sua vez!</div>');
   bindClient($('#act'),!s.sheet&&mine);

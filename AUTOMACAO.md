@@ -1,21 +1,28 @@
 # Perguntas diárias — procedimento da tarefa automática
 
-Objetivo: todos os dias, juntar **15 perguntas novas a cada um dos 7 temas**, até cada tema chegar às **2000 perguntas**. Um tema que já tenha 2000 não recebe mais. Quando os 7 temas chegarem às 2000, a tarefa termina o trabalho (ver o passo 7).
+Objetivo, em duas fases (decisão do Pedro a 22/11/2026):
+
+1. **Fase rápida, até 1000 por tema** nos 6 temas permanentes (his, geo, cie, ent, des, cul): em **cada execução**, juntar **100 perguntas** a cada tema que ainda tenha menos de 1000. A tarefa corre 4 vezes por dia.
+2. **Fase normal, de 1000 até 2000**: juntar **15 perguntas por tema por dia**, só na **primeira execução de cada dia**. Se já existir um ficheiro `dados-auto/` com a data de hoje que não seja da fase rápida, as outras execuções desse dia terminam sem fazer nada.
+3. **Atualidades (atu)**: sempre **15 por dia**, só na primeira execução do dia, porque cada notícia tem de ser verificada em 2 fontes. Para encher mais depressa, pode juntar também notícias marcantes dos últimos 12 meses, sempre com data, fonte e url.
+4. Um tema com 2000 ou mais não recebe mais perguntas. Quando os 7 temas chegarem às 2000, a tarefa termina o trabalho (ver o passo 7).
+
+Nome do ficheiro de cada execução: `dados-auto/AAAA-MM-DD-HHMM.json` (data e hora da execução), para várias execuções no mesmo dia não se sobreporem. Os ficheiros antigos `AAAA-MM-DD.json` continuam válidos.
 
 Repositório: `superverde/trivial-em-familia` (ramo `main`). Site: https://trivial-em-familia.onrender.com
 Não mexer noutros repositórios (em especial `superverde/equilibrio`).
 
 ## 1. Contagem atual
-Na raiz do repositório: `node tools/build.js` → mostra `contagem` por tema (`his`, `geo`, `cie`, `ent`, `des`, `cul`, `atu`). Para cada tema, faltam `2000 - contagem`; a quantidade a criar hoje é `min(15, falta)`.
+Na raiz do repositório: `node tools/build.js` → mostra `contagem` por tema (`his`, `geo`, `cie`, `ent`, `des`, `cul`, `atu`). Para cada tema: se a contagem for menor que 1000, criar `min(100, 1000 - contagem)` (fase rápida); se estiver entre 1000 e 1999, criar `min(15, 2000 - contagem)` apenas na primeira execução do dia.
 
 ## 2. Temas permanentes (his, geo, cie, ent, des, cul)
-Criar o ficheiro `dados-auto/AAAA-MM-DD.json` (data de hoje) com este formato:
+Criar o ficheiro `dados-auto/AAAA-MM-DD-HHMM.json` (data e hora desta execução) com este formato:
 
 ```json
 { "his": [[2, "Pergunta?", "Resposta certa", "Errada 1", "Errada 2", "Errada 3", "Explicação curta."]], "geo": [], "cie": [], "ent": [], "des": [], "cul": [] }
 ```
 
-- Posição 0: dificuldade 1 (fácil), 2 (média) ou 3 (difícil). Mistura por tema: cerca de 5 fáceis, 6 médias e 4 difíceis.
+- Posição 0: dificuldade 1 (fácil), 2 (média) ou 3 (difícil). Mistura: cerca de um terço fáceis, 40% médias e um quarto difíceis. Em lotes grandes (100), variar bem os subtemas e as épocas para não haver perguntas parecidas.
 - A **resposta certa vem sempre em 3.º lugar** (índice 2); o jogo baralha as opções.
 - Português europeu (acordo ortográfico de 1990), linguagem adequada a toda a família (crianças incluídas).
 - Só **factos estáveis e confirmados**. Nada de «quem é atualmente…» nos temas permanentes (isso fica desatualizado). Na dúvida, não incluir.
@@ -44,7 +51,7 @@ Juntar as perguntas ao fim da lista `perguntas` em `atualidades.json` e atualiza
 Subir a versão da cache em `sw.js` (`trivial-vN` → `trivial-vN+1`) para os telemóveis receberem as perguntas novas.
 
 ## 5. Publicar
-Commit com a mensagem `Perguntas do dia AAAA-MM-DD`, push para `main`. Depois, publicar no Render (o deploy automático não está ligado): serviço `srv-dc0pagp7lnhs739bv1u0`, workspace `tea-db3mmc49v7es73dmaeug` (trigger_deploy). Confirmar que o deploy fica `live`.
+Antes do push, fazer `git pull --rebase` (pode ter havido outra execução). Commit com a mensagem `Perguntas AAAA-MM-DD HHMM`, push para `main`. Depois, publicar no Render (o deploy automático não está ligado): serviço `srv-dc0pagp7lnhs739bv1u0`, workspace `tea-db3mmc49v7es73dmaeug` (trigger_deploy). Confirmar que o deploy fica `live`.
 
 ## 6. Resumo para o Pedro
 Uma mensagem curta em português europeu: quantas perguntas entraram por tema, a nova contagem total e por tema, as 3 notícias mais interessantes do dia e qualquer problema. Se o Pedro pedir para retirar ou corrigir uma pergunta, fazê-lo e voltar a publicar.
