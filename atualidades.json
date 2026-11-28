@@ -1,48 +1,888 @@
 {
-  "atualizado": "2026-11-23",
-  "perguntas": [
-    {"id":"20261121-01","d":1,"q":"Que seleção venceu o Mundial de futebol de 2026?","a":["Espanha","Argentina","França","Brasil"],"e":"A Espanha venceu a Argentina por 1-0, após prolongamento, a 19 de julho de 2026. Foi o segundo título mundial espanhol, depois de 2010.","fonte":"FIFA / Renascença","url":"https://inside.fifa.com/es/news/espana-campeona-mundial-2026-nueva-york-nueva-jersey","data":"2026-07-19"},
-    {"id":"20261121-02","d":3,"q":"Quem marcou o golo da vitória da Espanha na final do Mundial de 2026?","a":["Ferran Torres","Lamine Yamal","Pedri","Mikel Oyarzabal"],"e":"O golo surgiu no prolongamento, frente à Argentina.","fonte":"Renascença / Bem Paraná","url":"https://rr.pt/bola-branca/noticia/mundial-2026/2026/07/19/espanha-campea-do-mundo-na-despedida-de-messi/478897/","data":"2026-07-19"},
-    {"id":"20261121-03","d":2,"q":"Que seleção eliminou Portugal nos oitavos de final do Mundial de 2026?","a":["Espanha","Argentina","Bélgica","França"],"e":"Portugal perdeu por 1-0 com a Espanha, que viria a ser campeã do mundo.","fonte":"Observador / The Portugal News","url":"https://observador.pt/prognosticos/espanha-no-mundial/","data":"2026-07-06"},
-    {"id":"20261121-04","d":1,"q":"Quem é o selecionador nacional de futebol desde julho de 2026?","a":["Jorge Jesus","Roberto Martínez","José Mourinho","Fernando Santos"],"e":"Sucedeu a Roberto Martínez, aos 71 anos, com contrato até 2030. É a primeira vez que treina uma seleção.","fonte":"RTP / Renascença","url":"https://rr.pt/bola-branca/noticia/clube-portugal/2026/07/10/nova-era-da-selecao-portuguesa-comeca-esta-sexta-feira-com-a-presentacao-de-jorge-jesus/477804/","data":"2026-07-10"},
-    {"id":"20261121-05","d":1,"q":"Que jogador anunciou, a 5 de novembro de 2026, o adeus à seleção nacional, ao fim de 23 anos?","a":["Cristiano Ronaldo","Pepe","João Moutinho","Bernardo Silva"],"e":"Despediu-se num vídeo nas redes sociais, com recordes mundiais de jogos e de golos por seleções.","fonte":"RTP / Sábado","url":"https://www.rtp.pt/noticias/futebol-internacional/cristiano-ronaldo-diz-adeus-a-selecao-em-video-nas-redes-sociais_d1777045","data":"2026-11-05"},
-    {"id":"20261121-06","d":3,"q":"Com quantos golos pela seleção terminou Cristiano Ronaldo a carreira internacional?","a":["146","123","135","158"],"e":"Fez 234 jogos e 146 golos pela seleção: dois recordes mundiais.","fonte":"RTP / RFM","url":"https://www.rtp.pt/noticias/futebol-internacional/cristiano-ronaldo-diz-adeus-a-selecao-em-video-nas-redes-sociais_d1777045","data":"2026-11-05"},
-    {"id":"20261121-07","d":2,"q":"Que seleção goleou Portugal por 4-1, em Braga, na Liga das Nações de novembro de 2026?","a":["Dinamarca","País de Gales","Espanha","Noruega"],"e":"Dias depois, Portugal venceu no País de Gales por 3-2.","fonte":"Lusa / Notícias ao Minuto","url":"https://www.noticiasaominuto.com/desporto/3086111/portugal-desce-ao-sexto-lugar-do-ranking-da-fifa","data":"2026-11-14"},
-    {"id":"20261121-08","d":3,"q":"Em que lugar do ranking da FIFA ficou Portugal em novembro de 2026?","a":["6.º","3.º","9.º","1.º"],"e":"Desceu um lugar, ultrapassado por Marrocos. A Espanha lidera o ranking.","fonte":"Lusa / Notícias ao Minuto","url":"https://www.noticiasaominuto.com/desporto/3086111/portugal-desce-ao-sexto-lugar-do-ranking-da-fifa","data":"2026-11-18"},
-    {"id":"20261121-09","d":3,"q":"Que recorde bateu a Espanha no Mundial de 2026?","a":["Campeã com menos golos sofridos (1 em 8 jogos)","Mais golos marcados num Mundial","Mais vitórias por goleada","Mais penáltis defendidos"],"e":"Unai Simón foi eleito melhor guarda-redes do torneio.","fonte":"Observador / Bem Paraná","url":"https://observador.pt/2026/07/20/oito-jogos-um-golo-sofrido-o-melhor-registo-de-sempre-que-so-alimenta-o-recorde-brutal-de-fabian-ruiz/","data":"2026-07-20"},
-    {"id":"20261121-10","d":3,"q":"Que jogador se tornou, em 2026, o jogador de campo mais velho a disputar uma final do Mundial?","a":["Lionel Messi","Cristiano Ronaldo","Luka Modrić","Ángel Di María"],"e":"Messi tinha 39 anos na final contra a Espanha.","fonte":"Renascença / Bem Paraná","url":"https://rr.pt/bola-branca/noticia/mundial-2026/2026/07/19/espanha-campea-do-mundo-na-despedida-de-messi/478897/","data":"2026-07-19"},
-    {"id":"20261121-11","d":2,"q":"Quem se tornou primeiro-ministro do Reino Unido a 20 de julho de 2026?","a":["Andy Burnham","Keir Starmer","Angela Rayner","Wes Streeting"],"e":"Sucedeu a Keir Starmer, que se demitiu. É o sétimo primeiro-ministro britânico em dez anos.","fonte":"GOV.UK / CBS News","url":"https://www.gov.uk/government/people/andy-burnham","data":"2026-07-20"},
-    {"id":"20261121-12","d":2,"q":"Em que cidade se realizou a cimeira do clima COP31, em novembro de 2026?","a":["Antália, Turquia","Belém, Brasil","Sydney, Austrália","Bona, Alemanha"],"e":"Decorreu de 9 a 20 de novembro de 2026, numa parceria entre a Turquia e a Austrália.","fonte":"ONU (UNFCCC)","url":"https://unfccc.int/cop31","data":"2026-11-20"},
-    {"id":"20261121-13","d":3,"q":"Que seleção se tornou, em 2026, a primeira a ter ao mesmo tempo os títulos mundiais de futebol masculino e feminino?","a":["Espanha","Estados Unidos","Alemanha","Inglaterra"],"e":"A seleção feminina espanhola tinha sido campeã do mundo em 2023.","fonte":"Observador / FIFA","url":"https://observador.pt/prognosticos/espanha-no-mundial/","data":"2026-07-19"},
-    {"id":"20261121-14","d":2,"q":"Quem perdeu a final do Mundial de 2026?","a":["Argentina","França","Portugal","Bélgica"],"e":"A Argentina era a campeã em título, desde o Mundial de 2022.","fonte":"FIFA / Flashscore","url":"https://inside.fifa.com/es/news/espana-campeona-mundial-2026-nueva-york-nueva-jersey","data":"2026-07-19"},
-    {"id":"20261122-01","d":2,"q":"Quem foi reeleito Presidente do Brasil a 25 de outubro de 2026, para um quarto mandato?","a":["Lula da Silva","Flávio Bolsonaro","Tarcísio de Freitas","Ciro Gomes"],"e":"Lula foi Presidente pela primeira vez em 2003.","fonte":"Agência Senado / O Liberal","url":"https://www12.senado.leg.br/noticias/materias/2026/10/25/lula-2018vira2019-e-e-reeleito-para-quarto-mandato-de-presidente","data":"2026-10-25"},
-    {"id":"20261122-02","d":2,"q":"Quem foi o adversário de Lula na segunda volta das eleições presidenciais brasileiras de 2026?","a":["Flávio Bolsonaro","Jair Bolsonaro","Tarcísio de Freitas","Simone Tebet"],"e":"Flávio Bolsonaro é filho do antigo Presidente Jair Bolsonaro.","fonte":"O Liberal / Agência Senado","url":"https://www.oliberal.com/politica/com-100-das-secoes-totalizadas-lula-teve-51-79-e-flavio-48-21-1.1186890","data":"2026-10-25"},
-    {"id":"20261122-03","d":3,"q":"Que recorde bateu Lula nas eleições brasileiras de 2026?","a":["Presidente mais votado da história do Brasil","Presidente mais novo de sempre","Primeira vitória à primeira volta","Maior abstenção de sempre"],"e":"Recebeu mais de 64 milhões de votos, superando o seu próprio recorde.","fonte":"Diário do Nordeste / O Liberal","url":"https://diariodonordeste.verdesmares.com.br/pontopoder/com-642-milhoes-de-votos-lula-bate-o-proprio-recorde-e-e-o-presidente-mais-votado-da-historia-1.3801395","data":"2026-10-25"},
-    {"id":"20261122-04","d":2,"q":"Porque foi cancelado o segundo dia da Web Summit 2026, em Lisboa?","a":["Por causa da tempestade Charles","Por uma greve dos transportes","Por uma falha de energia","Por um alerta sanitário"],"e":"A organização cancelou o programa de 11 de novembro devido ao mau tempo.","fonte":"Euronews / The Irish Times","url":"https://www.euronews.com/2026/11/10/web-summit-lisbon-day-2-cancelled-due-to-storm-charles","data":"2026-11-10"},
-    {"id":"20261122-05","d":1,"q":"Cerca de quantas pessoas eram esperadas na Web Summit 2026, em Lisboa?","a":["70 mil","7 mil","20 mil","200 mil"],"e":"A cimeira de tecnologia realizou-se na FIL, no Parque das Nações.","fonte":"SAPO / idealista","url":"https://www.idealista.pt/news/financas/tecnologia/2026/11/09/78791-web-summit-2026-arranca-hoje-com-robos-humanoides-entre-os-oradores","data":"2026-11-09"},
-    {"id":"20261122-06","d":2,"q":"Que região autónoma ficou em aviso vermelho com a depressão Charles, em novembro de 2026?","a":["Madeira","Açores","Ambas as regiões autónomas","Nenhuma"],"e":"A depressão passou pela Madeira antes de chegar ao continente.","fonte":"A Bola / RTP","url":"https://www.rtp.pt/noticias/especiais/depressao-charles-a-caminho-da-madeira-e-de-portugal-continental_e1778025","data":"2026-11-10"},
-    {"id":"20261122-07","d":2,"q":"Que medida foi tomada em muitas escolas no dia 11 de novembro de 2026, por causa da depressão Charles?","a":["Encerraram","Fizeram simulacros de sismo","Anteciparam as férias de Natal","Passaram a abrir mais cedo"],"e":"As autoridades pediram às pessoas que ficassem em casa.","fonte":"Sábado / Wetter.net","url":"https://www.sabado.pt/portugal/detalhe/fiquem-em-casa-luis-neves-anuncia-o-encerramento-de-escolas-esta-quarta-feira","data":"2026-11-11"},
-    {"id":"20261122-08","d":2,"q":"Que piloto venceu o Grande Prémio de Las Vegas de Fórmula 1, em novembro de 2026?","a":["Max Verstappen","Lando Norris","Lewis Hamilton","Charles Leclerc"],"e":"A corrida disputa-se à noite, numa pista que passa pela famosa Strip.","fonte":"Mundiario / GPFans","url":"https://www.mundiario.com/deportes/formula-1/verstappen-conquista-gp-vegas-2026/20261122064036454304.html","data":"2026-11-22"},
-    {"id":"20261122-09","d":2,"q":"Em que cidade italiana se disputaram as ATP Finals de ténis de 2026?","a":["Turim","Milão","Roma","Bolonha"],"e":"Reúnem os oito melhores tenistas da época.","fonte":"ATP Tour / A Bola","url":"https://www.atptour.com/en/news/alcaraz-medvedev-nitto-atp-finals-2026-wednesday","data":"2026-11-19"},
-    {"id":"20261122-10","d":3,"q":"Que tenista derrotou Daniil Medvedev nas meias-finais das ATP Finals de 2026?","a":["Alexander Zverev","Jannik Sinner","Carlos Alcaraz","Ben Shelton"],"e":"Zverev chegou à final sem perder o serviço nesse encontro.","fonte":"Tênis News / Atleta Pro","url":"https://www.tenisnews.com.br/zverev-derruba-medvedev-decide-finals-alcaraz/","data":"2026-11-21"},
-    {"id":"20261122-11","d":2,"q":"Que tenistas disputaram a final das ATP Finals de 2026, a 22 de novembro?","a":["Alcaraz e Zverev","Sinner e Alcaraz","Zverev e Medvedev","Sinner e Djokovic"],"e":"Alcaraz chegou à final sem perder qualquer encontro.","fonte":"A Bola / Tênis News","url":"https://www.abola.pt/noticias/zverev-alcaraz-vao-travar-duelo-empolgante-pelas-atp-finals-2026112121500221548","data":"2026-11-21"},
-    {"id":"20261122-12","d":2,"q":"Em que cidade italiana se disputam as finais da Taça Davis de 2026?","a":["Bolonha","Málaga","Turim","Nápoles"],"e":"A Taça Davis é considerada o Campeonato do Mundo de ténis por equipas.","fonte":"SAPO / The Manila Times","url":"https://sapo.pt/artigo/davis-cup-finals-2026-decorrem-em-bologna-com-italia-a-defender-titulo-6b01bdfdf92df738364b36d1","data":"2026-11-21"},
-    {"id":"20261122-13","d":2,"q":"Que seleção defendia o título nas finais da Taça Davis de 2026?","a":["Itália","Espanha","Alemanha","Austrália"],"e":"A Itália tinha vencido as edições anteriores.","fonte":"SAPO / The Manila Times","url":"https://www.manilatimes.net/2026/11/21/tmt-newswire/2026-davis-cup-can-italy-defend-title/2475416","data":"2026-11-21"},
-    {"id":"20261122-14","d":3,"q":"Que filmes lideram as nomeações para os Prémios do Cinema Europeu de 2026?","a":["Fatherland e A Bola Negra","Fjord e Anora","Emilia Pérez e Fatherland","A Bola Negra e Conclave"],"e":"As nomeações foram anunciadas a 16 de novembro de 2026.","fonte":"Euronews / Screen Daily","url":"https://euronews.com/2026/11/16/european-film-awards-fatherland-la-bola-negra-and-fjord-lead-the-nominations","data":"2026-11-16"},
-    {"id":"20261122-15","d":3,"q":"Que filme ficou logo atrás de Fatherland e A Bola Negra nas nomeações para os Prémios do Cinema Europeu de 2026?","a":["Fjord","Anora","The Brutalist","Conclave"],"e":"Fjord recebeu cinco nomeações.","fonte":"Euronews / Screen Daily","url":"https://it.euronews.com/2026/11/16/european-film-awards-fatherland-e-la-bola-negra-guidano-le-nomination-fjord-a-quota-cinque","data":"2026-11-16"},
-    {"id":"20261123-01","d":2,"t":"cul","q":"Que museu de Lisboa reabriu a 21 de novembro de 2026, após mais de um ano em obras?","a":["Museu Nacional de Arte Antiga","Museu Nacional do Azulejo","Museu Calouste Gulbenkian","Museu Nacional de Arqueologia"],"e":"O MNAA reabriu parcialmente a 21 de novembro, com entrada gratuita até 1 de dezembro, depois de obras de 8,5 milhões de euros financiadas pelo PRR.","fonte":"Time Out Lisboa / Sábado","url":"https://www.timeout.pt/lisboa/pt/noticias/museu-nacional-de-arte-antiga-reabre-parcialmente-a-21-de-novembro-101326","data":"2026-11-21"},
-    {"id":"20261123-02","d":2,"t":"cul","q":"Que escritor recebeu, em novembro de 2026, o Prémio Vida e Obra da Sociedade Portuguesa de Autores?","a":["Mário Cláudio","Gonçalo M. Tavares","José Luís Peixoto","Valter Hugo Mãe"],"e":"O escritor portuense Mário Cláudio foi distinguido pela SPA com o Prémio Vida e Obra, anunciado a 19 de novembro de 2026.","fonte":"Notícias ao Minuto / Correio da Manhã / SPA","url":"https://www.noticiasaominuto.com/cultura/3086956/mario-claudio-distinguido-com-premio-vida-e-obra-da-spa","data":"2026-11-19"},
-    {"id":"20261123-03","d":2,"t":"cul","q":"Que artista venceu o Grammy Latino de Álbum do Ano em 2026, com «Lux»?","a":["Rosalía","Bad Bunny","Shakira","Karol G"],"e":"Na 27.ª gala dos Grammy Latinos, a 12 de novembro de 2026, em Las Vegas, a espanhola Rosalía venceu Álbum do Ano com «Lux» e Canção do Ano com «La perla».","fonte":"Telemundo / Folha de Pernambuco","url":"https://www.telemundo.com/noticias/noticias-telemundo/cultura/lux-de-la-cantante-espanola-rosalia-gana-el-premio-al-album-del-ano-en-rcna609112","data":"2026-11-12"},
-    {"id":"20261123-04","d":2,"t":"cul","q":"Que cantora brasileira ganhou em 2026 o seu primeiro Grammy Latino, com o álbum «Equilibrivm»?","a":["Anitta","Ivete Sangalo","Marisa Monte","Ludmilla"],"e":"Anitta venceu Melhor Álbum de Pop Contemporâneo em Língua Portuguesa, o seu primeiro Grammy Latino, ao fim de 12 nomeações.","fonte":"Folha de Pernambuco / Telemundo","url":"https://www.folhape.com.br/cultura/rosalia-triunfa-no-grammy-latino-anitta-vence-album-de-pop/524022/","data":"2026-11-12"},
-    {"id":"20261123-05","d":2,"t":"cie","q":"Que sonda espacial atingiu, em novembro de 2026, a distância de um dia-luz da Terra?","a":["Voyager 1","Voyager 2","New Horizons","Pioneer 10"],"e":"Lançada em 1977, a Voyager 1 chegou a cerca de 26 mil milhões de km: um sinal demora 24 horas a chegar-lhe.","fonte":"Al Jazeera / ITV News","url":"https://www.aljazeera.com/news/2026/11/18/nasas-voyager-1-hits-record-one-light-day-distance-50-years-after-launch","data":"2026-11-18"},
-    {"id":"20261123-06","d":3,"t":"cie","q":"Em que galáxia observaram os astrónomos a fusão de duas estrelas, o sistema «Bao», relatada na Nature em novembro de 2026?","a":["Andrómeda","Via Láctea","Triângulo","Grande Nuvem de Magalhães"],"e":"O sistema AT 2025abao, alcunhado «Bao», fica na galáxia de Andrómeda; a estrela gigante engoliu a companheira, num estudo publicado a 18 de novembro.","fonte":"Science News / New Space Economy","url":"https://www.sciencenews.org/article/stars-andromeda-galaxy-merge-little-bao","data":"2026-11-18"},
-    {"id":"20261123-07","d":3,"t":"cie","q":"Para que planeta seguem as sondas gémeas ESCAPADE, da NASA, depois de passarem pela Terra em novembro de 2026?","a":["Marte","Vénus","Júpiter","Mercúrio"],"e":"As duas sondas fizeram voos rasantes à Terra a 7 e 9 de novembro de 2026 e devem entrar em órbita de Marte em setembro de 2027.","fonte":"NASA / New Space Economy","url":"https://science.nasa.gov/science-research/heliophysics/nasas-escapade-completes-powered-earth-flybys-now-en-route-to-mars/","data":"2026-11-09"},
-    {"id":"20261123-09","d":2,"t":"pol","q":"Que despesa passa a contar, a partir de 2027, para a dedução de cultura no IRS, segundo o Orçamento do Estado aprovado na especialidade?","a":["Bilhetes de cinema","Assinaturas de streaming","Compra de instrumentos musicais","Cursos de línguas"],"e":"A 19 de novembro de 2026, o Parlamento aprovou a inclusão dos bilhetes de cinema: pode deduzir-se 15% do IVA pago, com NIF na fatura.","fonte":"Diário de Notícias / RTP","url":"https://www.dn.pt/cultura/oe2027-bilhetes-de-cinema-entram-para-dedues-de-cultura-no-irs","data":"2026-11-19"},
-    {"id":"20261123-10","d":3,"t":"pol","q":"Em que percentagem são atualizados os limites dos escalões de IRS para 2027?","a":["3,88%","2,5%","3,51%","5%"],"e":"O Parlamento aprovou, a 19 de novembro de 2026, a atualização de 3,88% proposta pelo Governo; as taxas mantêm-se iguais às de 2026.","fonte":"RTP / DNoticias","url":"https://www.rtp.pt/noticias/economia/oe2027-chumbadas-propostas-da-oposicao-para-baixar-irs-e-aprovadas-as-descidas-do-governo_n1780303","data":"2026-11-19"},
-    {"id":"20261123-11","d":3,"t":"pol","q":"Em cerca de quanto reduz a proposta de António Costa, de novembro de 2026, o orçamento da UE para 2028–2034 face à proposta da Comissão?","a":["Cerca de 10%","Cerca de 2%","Cerca de 25%","Não reduz, aumenta 10%"],"e":"A proposta do presidente do Conselho Europeu corta cerca de 10,2% (preços de 2025) face à Comissão; o Parlamento Europeu rejeitou um orçamento mais reduzido.","fonte":"Observador / Diário de Notícias","url":"https://observador.pt/2026/11/21/portugal-com-corte-de-400-milhoes-de-euros-em-proposta-de-costa-para-orcamento-da-ue-ate-2034/","data":"2026-11-21"},
-    {"id":"20261123-12","d":2,"t":"mun","q":"Com que país asiático aprovaram os governos da UE, em novembro de 2026, a assinatura de um acordo comercial?","a":["Indonésia","Índia","Tailândia","Filipinas"],"e":"O Conselho da UE aprovou a assinatura do acordo com a Indonésia, que elimina direitos aduaneiros sobre mais de 90% dos produtos.","fonte":"Reuters / Al Jazeera","url":"https://www.aljazeera.com/economy/2026/11/19/eu-governments-approve-trade-deal-with-indonesia-to-offset-trump-tariffs","data":"2026-11-18"},
-    {"id":"20261123-13","d":2,"t":"mun","q":"Que cidade peruana, onde foi bispo, visitou o Papa Leão XIV em novembro de 2026?","a":["Chiclayo","Arequipa","Trujillo","Iquitos"],"e":"Na viagem ao Peru (11 a 17 de novembro), o Papa regressou a Chiclayo, diocese de que foi bispo.","fonte":"El Peruano / Vatican News","url":"https://elperuano.pe/noticia/308922-papa-leon-xiv-llego-a-su-querido-chiclayo-multitud-de-fieles-recibe-al-santo-padre","data":"2026-11-13"},
-    {"id":"20261123-14","d":2,"t":"mun","q":"Por que país começou a viagem do Papa Leão XIV à América do Sul, em novembro de 2026?","a":["Uruguai","Brasil","Chile","Peru"],"e":"A viagem de 6 a 17 de novembro passou pelo Uruguai, Argentina e Peru, por esta ordem.","fonte":"Vatican News / Reuters","url":"https://www.vaticannews.va/pt/papa/news/2026-08/papa-viagem-apostolica-uruguai-argentina-peru-america-latina.html","data":"2026-11-06"},
-    {"id":"20261123-15","d":2,"t":"des","q":"Quem venceu as ATP Finals de ténis de 2026, em Turim?","a":["Carlos Alcaraz","Alexander Zverev","Jannik Sinner","Daniil Medvedev"],"e":"A 22 de novembro de 2026, Alcaraz bateu Zverev por 6-2 e 7-6 e conquistou pela primeira vez as ATP Finals.","fonte":"Japan Times / Washington Post","url":"https://www.japantimes.co.jp/sports/2026/11/23/tennis/alcaraz-atp-finals-title/","data":"2026-11-22"}
-  ]
+ "atualizado": "2026-11-28",
+ "perguntas": [
+  {
+   "id": "20261121-01",
+   "d": 1,
+   "q": "Que seleção venceu o Mundial de futebol de 2026?",
+   "a": [
+    "Espanha",
+    "Argentina",
+    "França",
+    "Brasil"
+   ],
+   "e": "A Espanha venceu a Argentina por 1-0, após prolongamento, a 19 de julho de 2026. Foi o segundo título mundial espanhol, depois de 2010.",
+   "fonte": "FIFA / Renascença",
+   "url": "https://inside.fifa.com/es/news/espana-campeona-mundial-2026-nueva-york-nueva-jersey",
+   "data": "2026-07-19"
+  },
+  {
+   "id": "20261121-02",
+   "d": 3,
+   "q": "Quem marcou o golo da vitória da Espanha na final do Mundial de 2026?",
+   "a": [
+    "Ferran Torres",
+    "Lamine Yamal",
+    "Pedri",
+    "Mikel Oyarzabal"
+   ],
+   "e": "O golo surgiu no prolongamento, frente à Argentina.",
+   "fonte": "Renascença / Bem Paraná",
+   "url": "https://rr.pt/bola-branca/noticia/mundial-2026/2026/07/19/espanha-campea-do-mundo-na-despedida-de-messi/478897/",
+   "data": "2026-07-19"
+  },
+  {
+   "id": "20261121-03",
+   "d": 2,
+   "q": "Que seleção eliminou Portugal nos oitavos de final do Mundial de 2026?",
+   "a": [
+    "Espanha",
+    "Argentina",
+    "Bélgica",
+    "França"
+   ],
+   "e": "Portugal perdeu por 1-0 com a Espanha, que viria a ser campeã do mundo.",
+   "fonte": "Observador / The Portugal News",
+   "url": "https://observador.pt/prognosticos/espanha-no-mundial/",
+   "data": "2026-07-06"
+  },
+  {
+   "id": "20261121-04",
+   "d": 1,
+   "q": "Quem é o selecionador nacional de futebol desde julho de 2026?",
+   "a": [
+    "Jorge Jesus",
+    "Roberto Martínez",
+    "José Mourinho",
+    "Fernando Santos"
+   ],
+   "e": "Sucedeu a Roberto Martínez, aos 71 anos, com contrato até 2030. É a primeira vez que treina uma seleção.",
+   "fonte": "RTP / Renascença",
+   "url": "https://rr.pt/bola-branca/noticia/clube-portugal/2026/07/10/nova-era-da-selecao-portuguesa-comeca-esta-sexta-feira-com-a-presentacao-de-jorge-jesus/477804/",
+   "data": "2026-07-10"
+  },
+  {
+   "id": "20261121-05",
+   "d": 1,
+   "q": "Que jogador anunciou, a 5 de novembro de 2026, o adeus à seleção nacional, ao fim de 23 anos?",
+   "a": [
+    "Cristiano Ronaldo",
+    "Pepe",
+    "João Moutinho",
+    "Bernardo Silva"
+   ],
+   "e": "Despediu-se num vídeo nas redes sociais, com recordes mundiais de jogos e de golos por seleções.",
+   "fonte": "RTP / Sábado",
+   "url": "https://www.rtp.pt/noticias/futebol-internacional/cristiano-ronaldo-diz-adeus-a-selecao-em-video-nas-redes-sociais_d1777045",
+   "data": "2026-11-05"
+  },
+  {
+   "id": "20261121-06",
+   "d": 3,
+   "q": "Com quantos golos pela seleção terminou Cristiano Ronaldo a carreira internacional?",
+   "a": [
+    "146",
+    "123",
+    "135",
+    "158"
+   ],
+   "e": "Fez 234 jogos e 146 golos pela seleção: dois recordes mundiais.",
+   "fonte": "RTP / RFM",
+   "url": "https://www.rtp.pt/noticias/futebol-internacional/cristiano-ronaldo-diz-adeus-a-selecao-em-video-nas-redes-sociais_d1777045",
+   "data": "2026-11-05"
+  },
+  {
+   "id": "20261121-07",
+   "d": 2,
+   "q": "Que seleção goleou Portugal por 4-1, em Braga, na Liga das Nações de novembro de 2026?",
+   "a": [
+    "Dinamarca",
+    "País de Gales",
+    "Espanha",
+    "Noruega"
+   ],
+   "e": "Dias depois, Portugal venceu no País de Gales por 3-2.",
+   "fonte": "Lusa / Notícias ao Minuto",
+   "url": "https://www.noticiasaominuto.com/desporto/3086111/portugal-desce-ao-sexto-lugar-do-ranking-da-fifa",
+   "data": "2026-11-14"
+  },
+  {
+   "id": "20261121-08",
+   "d": 3,
+   "q": "Em que lugar do ranking da FIFA ficou Portugal em novembro de 2026?",
+   "a": [
+    "6.º",
+    "3.º",
+    "9.º",
+    "1.º"
+   ],
+   "e": "Desceu um lugar, ultrapassado por Marrocos. A Espanha lidera o ranking.",
+   "fonte": "Lusa / Notícias ao Minuto",
+   "url": "https://www.noticiasaominuto.com/desporto/3086111/portugal-desce-ao-sexto-lugar-do-ranking-da-fifa",
+   "data": "2026-11-18"
+  },
+  {
+   "id": "20261121-09",
+   "d": 3,
+   "q": "Que recorde bateu a Espanha no Mundial de 2026?",
+   "a": [
+    "Campeã com menos golos sofridos (1 em 8 jogos)",
+    "Mais golos marcados num Mundial",
+    "Mais vitórias por goleada",
+    "Mais penáltis defendidos"
+   ],
+   "e": "Unai Simón foi eleito melhor guarda-redes do torneio.",
+   "fonte": "Observador / Bem Paraná",
+   "url": "https://observador.pt/2026/07/20/oito-jogos-um-golo-sofrido-o-melhor-registo-de-sempre-que-so-alimenta-o-recorde-brutal-de-fabian-ruiz/",
+   "data": "2026-07-20"
+  },
+  {
+   "id": "20261121-10",
+   "d": 3,
+   "q": "Que jogador se tornou, em 2026, o jogador de campo mais velho a disputar uma final do Mundial?",
+   "a": [
+    "Lionel Messi",
+    "Cristiano Ronaldo",
+    "Luka Modrić",
+    "Ángel Di María"
+   ],
+   "e": "Messi tinha 39 anos na final contra a Espanha.",
+   "fonte": "Renascença / Bem Paraná",
+   "url": "https://rr.pt/bola-branca/noticia/mundial-2026/2026/07/19/espanha-campea-do-mundo-na-despedida-de-messi/478897/",
+   "data": "2026-07-19"
+  },
+  {
+   "id": "20261121-11",
+   "d": 2,
+   "q": "Quem se tornou primeiro-ministro do Reino Unido a 20 de julho de 2026?",
+   "a": [
+    "Andy Burnham",
+    "Keir Starmer",
+    "Angela Rayner",
+    "Wes Streeting"
+   ],
+   "e": "Sucedeu a Keir Starmer, que se demitiu. É o sétimo primeiro-ministro britânico em dez anos.",
+   "fonte": "GOV.UK / CBS News",
+   "url": "https://www.gov.uk/government/people/andy-burnham",
+   "data": "2026-07-20"
+  },
+  {
+   "id": "20261121-12",
+   "d": 2,
+   "q": "Em que cidade se realizou a cimeira do clima COP31, em novembro de 2026?",
+   "a": [
+    "Antália, Turquia",
+    "Belém, Brasil",
+    "Sydney, Austrália",
+    "Bona, Alemanha"
+   ],
+   "e": "Decorreu de 9 a 20 de novembro de 2026, numa parceria entre a Turquia e a Austrália.",
+   "fonte": "ONU (UNFCCC)",
+   "url": "https://unfccc.int/cop31",
+   "data": "2026-11-20"
+  },
+  {
+   "id": "20261121-13",
+   "d": 3,
+   "q": "Que seleção se tornou, em 2026, a primeira a ter ao mesmo tempo os títulos mundiais de futebol masculino e feminino?",
+   "a": [
+    "Espanha",
+    "Estados Unidos",
+    "Alemanha",
+    "Inglaterra"
+   ],
+   "e": "A seleção feminina espanhola tinha sido campeã do mundo em 2023.",
+   "fonte": "Observador / FIFA",
+   "url": "https://observador.pt/prognosticos/espanha-no-mundial/",
+   "data": "2026-07-19"
+  },
+  {
+   "id": "20261121-14",
+   "d": 2,
+   "q": "Quem perdeu a final do Mundial de 2026?",
+   "a": [
+    "Argentina",
+    "França",
+    "Portugal",
+    "Bélgica"
+   ],
+   "e": "A Argentina era a campeã em título, desde o Mundial de 2022.",
+   "fonte": "FIFA / Flashscore",
+   "url": "https://inside.fifa.com/es/news/espana-campeona-mundial-2026-nueva-york-nueva-jersey",
+   "data": "2026-07-19"
+  },
+  {
+   "id": "20261122-01",
+   "d": 2,
+   "q": "Quem foi reeleito Presidente do Brasil a 25 de outubro de 2026, para um quarto mandato?",
+   "a": [
+    "Lula da Silva",
+    "Flávio Bolsonaro",
+    "Tarcísio de Freitas",
+    "Ciro Gomes"
+   ],
+   "e": "Lula foi Presidente pela primeira vez em 2003.",
+   "fonte": "Agência Senado / O Liberal",
+   "url": "https://www12.senado.leg.br/noticias/materias/2026/10/25/lula-2018vira2019-e-e-reeleito-para-quarto-mandato-de-presidente",
+   "data": "2026-10-25"
+  },
+  {
+   "id": "20261122-02",
+   "d": 2,
+   "q": "Quem foi o adversário de Lula na segunda volta das eleições presidenciais brasileiras de 2026?",
+   "a": [
+    "Flávio Bolsonaro",
+    "Jair Bolsonaro",
+    "Tarcísio de Freitas",
+    "Simone Tebet"
+   ],
+   "e": "Flávio Bolsonaro é filho do antigo Presidente Jair Bolsonaro.",
+   "fonte": "O Liberal / Agência Senado",
+   "url": "https://www.oliberal.com/politica/com-100-das-secoes-totalizadas-lula-teve-51-79-e-flavio-48-21-1.1186890",
+   "data": "2026-10-25"
+  },
+  {
+   "id": "20261122-03",
+   "d": 3,
+   "q": "Que recorde bateu Lula nas eleições brasileiras de 2026?",
+   "a": [
+    "Presidente mais votado da história do Brasil",
+    "Presidente mais novo de sempre",
+    "Primeira vitória à primeira volta",
+    "Maior abstenção de sempre"
+   ],
+   "e": "Recebeu mais de 64 milhões de votos, superando o seu próprio recorde.",
+   "fonte": "Diário do Nordeste / O Liberal",
+   "url": "https://diariodonordeste.verdesmares.com.br/pontopoder/com-642-milhoes-de-votos-lula-bate-o-proprio-recorde-e-e-o-presidente-mais-votado-da-historia-1.3801395",
+   "data": "2026-10-25"
+  },
+  {
+   "id": "20261122-04",
+   "d": 2,
+   "q": "Porque foi cancelado o segundo dia da Web Summit 2026, em Lisboa?",
+   "a": [
+    "Por causa da tempestade Charles",
+    "Por uma greve dos transportes",
+    "Por uma falha de energia",
+    "Por um alerta sanitário"
+   ],
+   "e": "A organização cancelou o programa de 11 de novembro devido ao mau tempo.",
+   "fonte": "Euronews / The Irish Times",
+   "url": "https://www.euronews.com/2026/11/10/web-summit-lisbon-day-2-cancelled-due-to-storm-charles",
+   "data": "2026-11-10"
+  },
+  {
+   "id": "20261122-05",
+   "d": 1,
+   "q": "Cerca de quantas pessoas eram esperadas na Web Summit 2026, em Lisboa?",
+   "a": [
+    "70 mil",
+    "7 mil",
+    "20 mil",
+    "200 mil"
+   ],
+   "e": "A cimeira de tecnologia realizou-se na FIL, no Parque das Nações.",
+   "fonte": "SAPO / idealista",
+   "url": "https://www.idealista.pt/news/financas/tecnologia/2026/11/09/78791-web-summit-2026-arranca-hoje-com-robos-humanoides-entre-os-oradores",
+   "data": "2026-11-09"
+  },
+  {
+   "id": "20261122-06",
+   "d": 2,
+   "q": "Que região autónoma ficou em aviso vermelho com a depressão Charles, em novembro de 2026?",
+   "a": [
+    "Madeira",
+    "Açores",
+    "Ambas as regiões autónomas",
+    "Nenhuma"
+   ],
+   "e": "A depressão passou pela Madeira antes de chegar ao continente.",
+   "fonte": "A Bola / RTP",
+   "url": "https://www.rtp.pt/noticias/especiais/depressao-charles-a-caminho-da-madeira-e-de-portugal-continental_e1778025",
+   "data": "2026-11-10"
+  },
+  {
+   "id": "20261122-07",
+   "d": 2,
+   "q": "Que medida foi tomada em muitas escolas no dia 11 de novembro de 2026, por causa da depressão Charles?",
+   "a": [
+    "Encerraram",
+    "Fizeram simulacros de sismo",
+    "Anteciparam as férias de Natal",
+    "Passaram a abrir mais cedo"
+   ],
+   "e": "As autoridades pediram às pessoas que ficassem em casa.",
+   "fonte": "Sábado / Wetter.net",
+   "url": "https://www.sabado.pt/portugal/detalhe/fiquem-em-casa-luis-neves-anuncia-o-encerramento-de-escolas-esta-quarta-feira",
+   "data": "2026-11-11"
+  },
+  {
+   "id": "20261122-08",
+   "d": 2,
+   "q": "Que piloto venceu o Grande Prémio de Las Vegas de Fórmula 1, em novembro de 2026?",
+   "a": [
+    "Max Verstappen",
+    "Lando Norris",
+    "Lewis Hamilton",
+    "Charles Leclerc"
+   ],
+   "e": "A corrida disputa-se à noite, numa pista que passa pela famosa Strip.",
+   "fonte": "Mundiario / GPFans",
+   "url": "https://www.mundiario.com/deportes/formula-1/verstappen-conquista-gp-vegas-2026/20261122064036454304.html",
+   "data": "2026-11-22"
+  },
+  {
+   "id": "20261122-09",
+   "d": 2,
+   "q": "Em que cidade italiana se disputaram as ATP Finals de ténis de 2026?",
+   "a": [
+    "Turim",
+    "Milão",
+    "Roma",
+    "Bolonha"
+   ],
+   "e": "Reúnem os oito melhores tenistas da época.",
+   "fonte": "ATP Tour / A Bola",
+   "url": "https://www.atptour.com/en/news/alcaraz-medvedev-nitto-atp-finals-2026-wednesday",
+   "data": "2026-11-19"
+  },
+  {
+   "id": "20261122-10",
+   "d": 3,
+   "q": "Que tenista derrotou Daniil Medvedev nas meias-finais das ATP Finals de 2026?",
+   "a": [
+    "Alexander Zverev",
+    "Jannik Sinner",
+    "Carlos Alcaraz",
+    "Ben Shelton"
+   ],
+   "e": "Zverev chegou à final sem perder o serviço nesse encontro.",
+   "fonte": "Tênis News / Atleta Pro",
+   "url": "https://www.tenisnews.com.br/zverev-derruba-medvedev-decide-finals-alcaraz/",
+   "data": "2026-11-21"
+  },
+  {
+   "id": "20261122-11",
+   "d": 2,
+   "q": "Que tenistas disputaram a final das ATP Finals de 2026, a 22 de novembro?",
+   "a": [
+    "Alcaraz e Zverev",
+    "Sinner e Alcaraz",
+    "Zverev e Medvedev",
+    "Sinner e Djokovic"
+   ],
+   "e": "Alcaraz chegou à final sem perder qualquer encontro.",
+   "fonte": "A Bola / Tênis News",
+   "url": "https://www.abola.pt/noticias/zverev-alcaraz-vao-travar-duelo-empolgante-pelas-atp-finals-2026112121500221548",
+   "data": "2026-11-21"
+  },
+  {
+   "id": "20261122-12",
+   "d": 2,
+   "q": "Em que cidade italiana se disputaram as finais da Taça Davis de 2026?",
+   "a": [
+    "Bolonha",
+    "Málaga",
+    "Turim",
+    "Nápoles"
+   ],
+   "e": "A Taça Davis é considerada o Campeonato do Mundo de ténis por equipas.",
+   "fonte": "SAPO / The Manila Times",
+   "url": "https://sapo.pt/artigo/davis-cup-finals-2026-decorrem-em-bologna-com-italia-a-defender-titulo-6b01bdfdf92df738364b36d1",
+   "data": "2026-11-21"
+  },
+  {
+   "id": "20261122-13",
+   "d": 2,
+   "q": "Que seleção defendia o título nas finais da Taça Davis de 2026?",
+   "a": [
+    "Itália",
+    "Espanha",
+    "Alemanha",
+    "Austrália"
+   ],
+   "e": "A Itália tinha vencido as edições anteriores.",
+   "fonte": "SAPO / The Manila Times",
+   "url": "https://www.manilatimes.net/2026/11/21/tmt-newswire/2026-davis-cup-can-italy-defend-title/2475416",
+   "data": "2026-11-21"
+  },
+  {
+   "id": "20261122-14",
+   "d": 3,
+   "q": "Que filmes lideram as nomeações para os Prémios do Cinema Europeu de 2026?",
+   "a": [
+    "Fatherland e A Bola Negra",
+    "Fjord e Anora",
+    "Emilia Pérez e Fatherland",
+    "A Bola Negra e Conclave"
+   ],
+   "e": "As nomeações foram anunciadas a 16 de novembro de 2026.",
+   "fonte": "Euronews / Screen Daily",
+   "url": "https://euronews.com/2026/11/16/european-film-awards-fatherland-la-bola-negra-and-fjord-lead-the-nominations",
+   "data": "2026-11-16"
+  },
+  {
+   "id": "20261122-15",
+   "d": 3,
+   "q": "Que filme ficou logo atrás de Fatherland e A Bola Negra nas nomeações para os Prémios do Cinema Europeu de 2026?",
+   "a": [
+    "Fjord",
+    "Anora",
+    "The Brutalist",
+    "Conclave"
+   ],
+   "e": "Fjord recebeu cinco nomeações.",
+   "fonte": "Euronews / Screen Daily",
+   "url": "https://it.euronews.com/2026/11/16/european-film-awards-fatherland-e-la-bola-negra-guidano-le-nomination-fjord-a-quota-cinque",
+   "data": "2026-11-16"
+  },
+  {
+   "id": "20261123-01",
+   "d": 2,
+   "t": "cul",
+   "q": "Que museu de Lisboa reabriu a 21 de novembro de 2026, após mais de um ano em obras?",
+   "a": [
+    "Museu Nacional de Arte Antiga",
+    "Museu Nacional do Azulejo",
+    "Museu Calouste Gulbenkian",
+    "Museu Nacional de Arqueologia"
+   ],
+   "e": "O MNAA reabriu parcialmente a 21 de novembro, com entrada gratuita até 1 de dezembro, depois de obras de 8,5 milhões de euros financiadas pelo PRR.",
+   "fonte": "Time Out Lisboa / Sábado",
+   "url": "https://www.timeout.pt/lisboa/pt/noticias/museu-nacional-de-arte-antiga-reabre-parcialmente-a-21-de-novembro-101326",
+   "data": "2026-11-21"
+  },
+  {
+   "id": "20261123-02",
+   "d": 2,
+   "t": "cul",
+   "q": "Que escritor recebeu, em novembro de 2026, o Prémio Vida e Obra da Sociedade Portuguesa de Autores?",
+   "a": [
+    "Mário Cláudio",
+    "Gonçalo M. Tavares",
+    "José Luís Peixoto",
+    "Valter Hugo Mãe"
+   ],
+   "e": "O escritor portuense Mário Cláudio foi distinguido pela SPA com o Prémio Vida e Obra, anunciado a 19 de novembro de 2026.",
+   "fonte": "Notícias ao Minuto / Correio da Manhã / SPA",
+   "url": "https://www.noticiasaominuto.com/cultura/3086956/mario-claudio-distinguido-com-premio-vida-e-obra-da-spa",
+   "data": "2026-11-19"
+  },
+  {
+   "id": "20261123-03",
+   "d": 2,
+   "t": "cul",
+   "q": "Que artista venceu o Grammy Latino de Álbum do Ano em 2026, com «Lux»?",
+   "a": [
+    "Rosalía",
+    "Bad Bunny",
+    "Shakira",
+    "Karol G"
+   ],
+   "e": "Na 27.ª gala dos Grammy Latinos, a 12 de novembro de 2026, em Las Vegas, a espanhola Rosalía venceu Álbum do Ano com «Lux» e Canção do Ano com «La perla».",
+   "fonte": "Telemundo / Folha de Pernambuco",
+   "url": "https://www.telemundo.com/noticias/noticias-telemundo/cultura/lux-de-la-cantante-espanola-rosalia-gana-el-premio-al-album-del-ano-en-rcna609112",
+   "data": "2026-11-12"
+  },
+  {
+   "id": "20261123-04",
+   "d": 2,
+   "t": "cul",
+   "q": "Que cantora brasileira ganhou em 2026 o seu primeiro Grammy Latino, com o álbum «Equilibrivm»?",
+   "a": [
+    "Anitta",
+    "Ivete Sangalo",
+    "Marisa Monte",
+    "Ludmilla"
+   ],
+   "e": "Anitta venceu Melhor Álbum de Pop Contemporâneo em Língua Portuguesa, o seu primeiro Grammy Latino, ao fim de 12 nomeações.",
+   "fonte": "Folha de Pernambuco / Telemundo",
+   "url": "https://www.folhape.com.br/cultura/rosalia-triunfa-no-grammy-latino-anitta-vence-album-de-pop/524022/",
+   "data": "2026-11-12"
+  },
+  {
+   "id": "20261123-05",
+   "d": 2,
+   "t": "cie",
+   "q": "Que sonda espacial atingiu, em novembro de 2026, a distância de um dia-luz da Terra?",
+   "a": [
+    "Voyager 1",
+    "Voyager 2",
+    "New Horizons",
+    "Pioneer 10"
+   ],
+   "e": "Lançada em 1977, a Voyager 1 chegou a cerca de 26 mil milhões de km: um sinal demora 24 horas a chegar-lhe.",
+   "fonte": "Al Jazeera / ITV News",
+   "url": "https://www.aljazeera.com/news/2026/11/18/nasas-voyager-1-hits-record-one-light-day-distance-50-years-after-launch",
+   "data": "2026-11-18"
+  },
+  {
+   "id": "20261123-06",
+   "d": 3,
+   "t": "cie",
+   "q": "Em que galáxia observaram os astrónomos a fusão de duas estrelas, o sistema «Bao», relatada na Nature em novembro de 2026?",
+   "a": [
+    "Andrómeda",
+    "Via Láctea",
+    "Triângulo",
+    "Grande Nuvem de Magalhães"
+   ],
+   "e": "O sistema AT 2025abao, alcunhado «Bao», fica na galáxia de Andrómeda; a estrela gigante engoliu a companheira, num estudo publicado a 18 de novembro.",
+   "fonte": "Science News / New Space Economy",
+   "url": "https://www.sciencenews.org/article/stars-andromeda-galaxy-merge-little-bao",
+   "data": "2026-11-18"
+  },
+  {
+   "id": "20261123-07",
+   "d": 3,
+   "t": "cie",
+   "q": "Para que planeta seguem as sondas gémeas ESCAPADE, da NASA, depois de passarem pela Terra em novembro de 2026?",
+   "a": [
+    "Marte",
+    "Vénus",
+    "Júpiter",
+    "Mercúrio"
+   ],
+   "e": "As duas sondas fizeram voos rasantes à Terra a 7 e 9 de novembro de 2026 e devem entrar em órbita de Marte em setembro de 2027.",
+   "fonte": "NASA / New Space Economy",
+   "url": "https://science.nasa.gov/science-research/heliophysics/nasas-escapade-completes-powered-earth-flybys-now-en-route-to-mars/",
+   "data": "2026-11-09"
+  },
+  {
+   "id": "20261123-09",
+   "d": 2,
+   "t": "pol",
+   "q": "Que despesa passa a contar, a partir de 2027, para a dedução de cultura no IRS, segundo o Orçamento do Estado aprovado na especialidade?",
+   "a": [
+    "Bilhetes de cinema",
+    "Assinaturas de streaming",
+    "Compra de instrumentos musicais",
+    "Cursos de línguas"
+   ],
+   "e": "A 19 de novembro de 2026, o Parlamento aprovou a inclusão dos bilhetes de cinema: pode deduzir-se 15% do IVA pago, com NIF na fatura.",
+   "fonte": "Diário de Notícias / RTP",
+   "url": "https://www.dn.pt/cultura/oe2027-bilhetes-de-cinema-entram-para-dedues-de-cultura-no-irs",
+   "data": "2026-11-19"
+  },
+  {
+   "id": "20261123-10",
+   "d": 3,
+   "t": "pol",
+   "q": "Em que percentagem são atualizados os limites dos escalões de IRS para 2027?",
+   "a": [
+    "3,88%",
+    "2,5%",
+    "3,51%",
+    "5%"
+   ],
+   "e": "O Parlamento aprovou, a 19 de novembro de 2026, a atualização de 3,88% proposta pelo Governo; as taxas mantêm-se iguais às de 2026.",
+   "fonte": "RTP / DNoticias",
+   "url": "https://www.rtp.pt/noticias/economia/oe2027-chumbadas-propostas-da-oposicao-para-baixar-irs-e-aprovadas-as-descidas-do-governo_n1780303",
+   "data": "2026-11-19"
+  },
+  {
+   "id": "20261123-11",
+   "d": 3,
+   "t": "pol",
+   "q": "Em cerca de quanto reduz a proposta de António Costa, de novembro de 2026, o orçamento da UE para 2028–2034 face à proposta da Comissão?",
+   "a": [
+    "Cerca de 10%",
+    "Cerca de 2%",
+    "Cerca de 25%",
+    "Não reduz, aumenta 10%"
+   ],
+   "e": "A proposta do presidente do Conselho Europeu corta cerca de 10,2% (preços de 2025) face à Comissão; o Parlamento Europeu rejeitou um orçamento mais reduzido.",
+   "fonte": "Observador / Diário de Notícias",
+   "url": "https://observador.pt/2026/11/21/portugal-com-corte-de-400-milhoes-de-euros-em-proposta-de-costa-para-orcamento-da-ue-ate-2034/",
+   "data": "2026-11-21"
+  },
+  {
+   "id": "20261123-12",
+   "d": 2,
+   "t": "mun",
+   "q": "Com que país asiático aprovaram os governos da UE, em novembro de 2026, a assinatura de um acordo comercial?",
+   "a": [
+    "Indonésia",
+    "Índia",
+    "Tailândia",
+    "Filipinas"
+   ],
+   "e": "O Conselho da UE aprovou a assinatura do acordo com a Indonésia, que elimina direitos aduaneiros sobre mais de 90% dos produtos.",
+   "fonte": "Reuters / Al Jazeera",
+   "url": "https://www.aljazeera.com/economy/2026/11/19/eu-governments-approve-trade-deal-with-indonesia-to-offset-trump-tariffs",
+   "data": "2026-11-18"
+  },
+  {
+   "id": "20261123-13",
+   "d": 2,
+   "t": "mun",
+   "q": "Que cidade peruana, onde foi bispo, visitou o Papa Leão XIV em novembro de 2026?",
+   "a": [
+    "Chiclayo",
+    "Arequipa",
+    "Trujillo",
+    "Iquitos"
+   ],
+   "e": "Na viagem ao Peru (11 a 17 de novembro), o Papa regressou a Chiclayo, diocese de que foi bispo.",
+   "fonte": "El Peruano / Vatican News",
+   "url": "https://elperuano.pe/noticia/308922-papa-leon-xiv-llego-a-su-querido-chiclayo-multitud-de-fieles-recibe-al-santo-padre",
+   "data": "2026-11-13"
+  },
+  {
+   "id": "20261123-14",
+   "d": 2,
+   "t": "mun",
+   "q": "Por que país começou a viagem do Papa Leão XIV à América do Sul, em novembro de 2026?",
+   "a": [
+    "Uruguai",
+    "Brasil",
+    "Chile",
+    "Peru"
+   ],
+   "e": "A viagem de 6 a 17 de novembro passou pelo Uruguai, Argentina e Peru, por esta ordem.",
+   "fonte": "Vatican News / Reuters",
+   "url": "https://www.vaticannews.va/pt/papa/news/2026-08/papa-viagem-apostolica-uruguai-argentina-peru-america-latina.html",
+   "data": "2026-11-06"
+  },
+  {
+   "id": "20261123-15",
+   "d": 2,
+   "t": "des",
+   "q": "Quem venceu as ATP Finals de ténis de 2026, em Turim?",
+   "a": [
+    "Carlos Alcaraz",
+    "Alexander Zverev",
+    "Jannik Sinner",
+    "Daniil Medvedev"
+   ],
+   "e": "A 22 de novembro de 2026, Alcaraz bateu Zverev por 6-2 e 7-6 e conquistou pela primeira vez as ATP Finals.",
+   "fonte": "Japan Times / Washington Post",
+   "url": "https://www.japantimes.co.jp/sports/2026/11/23/tennis/alcaraz-atp-finals-title/",
+   "data": "2026-11-22"
+  },
+  {
+   "id": "20261128-01",
+   "d": 2,
+   "t": "cul",
+   "q": "Que prémio literário português ficou por atribuir em 2026, apesar de ter recebido 1684 romances, a edição mais concorrida de sempre?",
+   "a": [
+    "Prémio LeYa",
+    "Prémio Camões",
+    "Prémio Saramago",
+    "Prémio Pessoa"
+   ],
+   "e": "O júri do Prémio LeYa considerou que nenhum dos 1684 originais atingiu a qualidade exigida, anunciou a 25 de novembro de 2026.",
+   "fonte": "RTP / Diário de Notícias",
+   "url": "https://www.rtp.pt/noticias/cultura/premio-leya-fica-por-atribuir-por-falta-de-qualidade-de-candidaturas-em-edicao-mais-concorrida-de-sempre_n1781507",
+   "data": "2026-11-25"
+  },
+  {
+   "id": "20261128-02",
+   "d": 2,
+   "t": "cul",
+   "q": "Que escritora portuguesa venceu o Prémio Camões de 2026?",
+   "a": [
+    "Lídia Jorge",
+    "Teolinda Gersão",
+    "Hélia Correia",
+    "Ana Luísa Amaral"
+   ],
+   "e": "Lídia Jorge, autora de «A Costa dos Murmúrios», foi distinguida em julho de 2026 com o maior prémio da literatura em língua portuguesa.",
+   "fonte": "Governo de Portugal / Diário de Notícias / Renascença",
+   "url": "https://www.dn.pt/cultura/escritora-ldia-jorge-vence-prmio-cames-2026",
+   "data": "2026-07-02"
+  },
+  {
+   "id": "20261128-03",
+   "d": 2,
+   "t": "cul",
+   "q": "Que escritor se tornou, em 2026, o primeiro português a vencer o Prémio Formentor das Letras?",
+   "a": [
+    "Gonçalo M. Tavares",
+    "José Luís Peixoto",
+    "Valter Hugo Mãe",
+    "Afonso Cruz"
+   ],
+   "e": "O prémio espanhol, que já distinguiu Samuel Beckett e Jorge Luis Borges, foi atribuído por unanimidade a Gonçalo M. Tavares em março de 2026.",
+   "fonte": "RTP / Diário de Notícias",
+   "url": "https://www.rtp.pt/noticias/cultura/goncalo-m-tavares-distinguido-com-premio-espanhol-formentor-das-letras-2026_n1723070",
+   "data": "2026-03-03"
+  },
+  {
+   "id": "20261128-04",
+   "d": 2,
+   "t": "cul",
+   "q": "Que recorde bateu M. John Harrison ao vencer o Booker Prize de 2026, com «The End of Everything»?",
+   "a": [
+    "Vencedor mais velho de sempre, aos 81 anos",
+    "Vencedor mais novo de sempre",
+    "Primeiro a vencer três vezes",
+    "Livro mais curto de sempre a vencer"
+   ],
+   "e": "Aos 81 anos, o britânico tornou-se o vencedor mais velho do Booker e o primeiro autor de ficção científica a conquistá-lo.",
+   "fonte": "NPR / IBTimes UK",
+   "url": "https://www.gpb.org/news/2026/11/09/apocalyptic-sci-fi-novel-the-end-of-everything-wins-years-booker-prize",
+   "data": "2026-11-09"
+  },
+  {
+   "id": "20261128-05",
+   "d": 2,
+   "t": "cie",
+   "q": "Que telescópio espacial europeu, criado para estudar a matéria escura, descobriu o seu primeiro cometa em 2026?",
+   "a": [
+    "Euclid",
+    "Hubble",
+    "James Webb",
+    "Gaia"
+   ],
+   "e": "O cometa C/2026 S1 (Euclid) foi detetado por um estudante da Universidade de Helsínquia em imagens do telescópio Euclid; a ESA anunciou-o em novembro de 2026.",
+   "fonte": "ESA / Space.com",
+   "url": "https://www.esa.int/Science_Exploration/Space_Science/Euclid_discovers_new_comet",
+   "data": "2026-11-25"
+  },
+  {
+   "id": "20261128-06",
+   "d": 2,
+   "t": "cie",
+   "q": "Em órbita de que planeta entrou a missão europeia e japonesa BepiColombo, em novembro de 2026, após 8 anos de viagem?",
+   "a": [
+    "Mercúrio",
+    "Vénus",
+    "Marte",
+    "Júpiter"
+   ],
+   "e": "A sonda BepiColombo, da ESA e da JAXA, entrou em órbita de Mercúrio a 21 de novembro de 2026; a ESA confirmou dois dias depois que estava numa órbita segura e estável.",
+   "fonte": "ESA / SpacePolicyOnline",
+   "url": "https://www.esa.int/Science_Exploration/Space_Science/BepiColombo/Latest_updates_BepiColombo_s_arrival_at_Mercury",
+   "data": "2026-11-21"
+  },
+  {
+   "id": "20261128-07",
+   "d": 2,
+   "t": "cie",
+   "q": "Que sonda europeia chegou em novembro de 2026 ao asteroide Dimorphos, desviado em 2022 pela missão DART da NASA?",
+   "a": [
+    "Hera",
+    "Rosetta",
+    "Juice",
+    "Gaia"
+   ],
+   "e": "A sonda Hera, da ESA, chegou ao sistema de asteroides Didymos–Dimorphos a 4 de novembro de 2026 para estudar os efeitos do impacto da DART.",
+   "fonte": "SpacePolicyOnline / Smithsonian Magazine / DLR",
+   "url": "https://www.smithsonianmag.com/smart-news/europes-hera-spacecraft-has-begun-its-close-up-investigation-of-the-asteroid-system-nasa-intentionally-hit-in-2022-180989871/",
+   "data": "2026-11-04"
+  },
+  {
+   "id": "20261128-08",
+   "d": 2,
+   "t": "cie",
+   "q": "De que país é o astronauta anunciado em 2026 como o primeiro estrangeiro a viajar para a estação espacial chinesa Tiangong, na missão Shenzhou-24?",
+   "a": [
+    "Paquistão",
+    "Índia",
+    "Brasil",
+    "Egito"
+   ],
+   "e": "A China anunciou em novembro de 2026 que um astronauta paquistanês integraria a tripulação da Shenzhou-24, tornando-se o primeiro estrangeiro a visitar a Tiangong.",
+   "fonte": "Al Jazeera / Space.com / CGTN",
+   "url": "https://www.aljazeera.com/news/2026/11/7/pakistani-astronaut-to-join-chinas-next-space-station-mission",
+   "data": "2026-11-07"
+  },
+  {
+   "id": "20261128-09",
+   "d": 2,
+   "t": "pol",
+   "q": "Quantas vagas gratuitas abriu o Governo, em novembro de 2026, para formar professores sem formação pedagógica?",
+   "a": [
+    "1336",
+    "336",
+    "5000",
+    "13 360"
+   ],
+   "e": "O Conselho de Ministros aprovou até 7,1 milhões de euros para cursos em quatro instituições de ensino superior públicas, com 1336 vagas.",
+   "fonte": "Observador / Lusa / Braga TV",
+   "url": "https://observador.pt/2026/11/26/governo-aprova-71-milhoes-para-profissionalizacao-de-professores-sem-formacao-pedagogica-e-abre-1-336-vagas/",
+   "data": "2026-11-26"
+  },
+  {
+   "id": "20261128-10",
+   "d": 2,
+   "t": "pol",
+   "q": "Em que dia de 2026 foi aprovada na generalidade, na Assembleia da República, a proposta de Orçamento do Estado para 2027?",
+   "a": [
+    "28 de outubro",
+    "1 de outubro",
+    "25 de novembro",
+    "15 de dezembro"
+   ],
+   "e": "A proposta de OE2027 foi aprovada na generalidade a 28 de outubro de 2026, seguindo depois para a discussão na especialidade.",
+   "fonte": "Governo de Portugal / DNoticias / Sábado",
+   "url": "https://portugal.gov.pt/gc25/comunicacao/noticias/parlamento-aprova-na-generalidade-proposta-de-orcamento-do-estado-para-2027",
+   "data": "2026-10-28"
+  },
+  {
+   "id": "20261128-11",
+   "d": 2,
+   "t": "pol",
+   "q": "Em que cidade se realizou a cimeira entre a União Europeia e o Reino Unido de 20 de novembro de 2026?",
+   "a": [
+    "Bruxelas",
+    "Londres",
+    "Paris",
+    "Estrasburgo"
+   ],
+   "e": "A segunda cimeira UE–Reino Unido decorreu em Bruxelas a 20 de novembro de 2026, com o primeiro-ministro britânico Andy Burnham.",
+   "fonte": "Governo do Reino Unido / Brussels Times",
+   "url": "https://www.gov.uk/government/news/prime-minister-to-attend-uk-eu-summit-in-brussels-on-20-november",
+   "data": "2026-11-20"
+  },
+  {
+   "id": "20261128-12",
+   "d": 2,
+   "t": "mun",
+   "q": "Em que lugar ficou Portugal no Índice de Desempenho Climático (CCPI) apresentado na COP31, em novembro de 2026?",
+   "a": [
+    "11.º",
+    "1.º",
+    "25.º",
+    "40.º"
+   ],
+   "e": "Portugal subiu um lugar, para 11.º, mantendo-se no grupo dos países com melhor desempenho climático.",
+   "fonte": "RTP / Diário de Notícias",
+   "url": "https://www.rtp.pt/noticias/pais/portugal-sobe-um-lugar-para-11o-em-indice-de-desempenho-climatico_n1778320",
+   "data": "2026-11-17"
+  },
+  {
+   "id": "20261128-13",
+   "d": 2,
+   "t": "mun",
+   "q": "Que região portuguesa teve a maior fatia das dormidas turísticas no verão recorde de 2026?",
+   "a": [
+    "Algarve",
+    "Grande Lisboa",
+    "Norte",
+    "Madeira"
+   ],
+   "e": "Segundo o INE, entre julho e setembro de 2026 houve 29,2 milhões de dormidas, um recorde; o Algarve concentrou 29,6%.",
+   "fonte": "INE / Diário de Notícias",
+   "url": "https://www.dn.pt/economia/turismo-regista-melhor-vero-de-sempre-e-bate-novo-recorde-histrico-em-preos-receitas-e-dormidas",
+   "data": "2026-11-17"
+  },
+  {
+   "id": "20261128-14",
+   "d": 2,
+   "t": "mun",
+   "q": "Que percentagem da eletricidade produzida em Portugal em setembro de 2026 teve origem renovável?",
+   "a": [
+    "70,8%",
+    "30,8%",
+    "50,1%",
+    "95,2%"
+   ],
+   "e": "Em setembro de 2026, 70,8% da eletricidade produzida em Portugal veio de fontes renováveis.",
+   "fonte": "RTP / Lusa / DNoticias",
+   "url": "https://www.rtp.pt/noticias/economia/portugal-gerou-708-de-eletricidade-renovavel-em-setembro_n1771572",
+   "data": "2026-10-14"
+  }
+ ]
 }
